@@ -26,8 +26,8 @@ import { … } from "nepali-number"
 ## Pitfalls
 
 Behaviour that surprises people, each linked to its entry in
-[`../api/limitations.md`](../api/limitations.md).
+[limitations](../api/limitations.mdx).
 
 ## See also
 
-- [API reference](../api/README.md)
+- [API reference](../api/index.mdx)

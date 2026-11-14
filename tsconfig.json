@@ -31,5 +31,7 @@
     "paths": {
       "@/*": ["src/*"]
     }
-  }
+  },
+  // The documentation submodule in docs/ has its own TypeScript project — ADR-0010.
+  "include": ["src", "tsdown.config.ts"]
 }

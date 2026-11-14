@@ -42,4 +42,4 @@ name(12345678)     // → "…"   ≥ 1 crore
 name("abc")        // → "…"   invalid input
 ```
 
-**Notes.** Edge cases, rounding, and links to [`limitations.md`](limitations.md) entries.
+**Notes.** Edge cases, rounding, and links to [limitations](./limitations.mdx) entries.

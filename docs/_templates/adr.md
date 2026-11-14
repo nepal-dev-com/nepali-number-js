@@ -2,14 +2,14 @@
 
 - **Status:** Proposed
 - **Date:** YYYY-MM-DD
-- **Deciders:** Puncoz Nepal
+- **Deciders:** [@puncoz](https://github.com/puncoz)
 - **Approved by:** —
 - **Approved on:** —
 - **Supersedes:** —
 - **Superseded by:** —
-- **Semver impact:** none / patch / minor / major (see `docs/release/versioning.md`)
-- **Design documents:** `docs/api/<domain>.md` (when the public API changes, ADR-0008),
-  `docs/architecture/system.md`, … (the living docs this decision creates or changes — ADR-0002)
+- **Semver impact:** none / patch / minor / major (see `maintain/release/versioning.mdx`)
+- **Design documents:** `use/dev/api/<domain>.mdx` (when the public API changes, ADR-0008),
+  `maintain/architecture/system.mdx`, … (the living docs this decision creates or changes — ADR-0002)
 
 ## Context
 
@@ -77,18 +77,18 @@ the scope of the implementation that follows the approval.
 - [ ] Tests — the happy path **and** the obvious failure paths (ADR-0007): English and Nepali
       digits, empty, zero, negative, decimal, ≥ 1 crore, invalid.
 - [ ] `bun run type-check`, `bun run test` and `bun run build` pass.
-- [ ] Built CJS loaded with `node`; outputs match `docs/api/`.
+- [ ] Built CJS loaded with `node`; outputs match `use/dev/api/`.
 
 ## Docs to update on implementation
 
 Living documents are snapshots of the package as it stands — edit them in place, never as a
 log of what changed (ADR-0002). Delete anything in them that is no longer true.
 
-- [ ] `docs/api/<domain>.md` — signature, options, example outputs
-- [ ] `docs/api/limitations.md` — if a limitation is fixed or introduced
-- [ ] `docs/architecture/` · `docs/guides/` · `docs/release/` · `docs/security/` — whichever the
+- [ ] `use/dev/api/<domain>.mdx` — signature, options, example outputs
+- [ ] `use/dev/api/limitations.mdx` — if a limitation is fixed or introduced
+- [ ] `maintain/architecture/` · `use/dev/guides/` · `maintain/release/` · `maintain/security/` — whichever the
       change requires
 - [ ] `README.md` — API summary, examples
 - [ ] `AGENTS.md` — <what changes, if the way we work changed>
-- [ ] `docs/adr/README.md` — index row + status
+- [ ] `maintain/adr/index.mdx` — index row + status
 - [ ] Proposed commit message: `<type>: <summary>`
