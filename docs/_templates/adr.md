@@ -7,9 +7,9 @@
 - **Approved on:** —
 - **Supersedes:** —
 - **Superseded by:** —
-- **Semver impact:** none / patch / minor / major (see `maintain/release/versioning.mdx`)
-- **Design documents:** `use/dev/api/<domain>.mdx` (when the public API changes, ADR-0008),
-  `maintain/architecture/system.mdx`, … (the living docs this decision creates or changes — ADR-0002)
+- **Semver impact:** none / patch / minor / major (see `maintainer-guide/release/versioning.mdx`)
+- **Design documents:** `user-guide/dev/api/<domain>.mdx` (when the public API changes, ADR-0008),
+  `maintainer-guide/architecture/system.mdx`, … (the living docs this decision creates or changes — ADR-0002)
 
 ## Context
 
@@ -77,18 +77,18 @@ the scope of the implementation that follows the approval.
 - [ ] Tests — the happy path **and** the obvious failure paths (ADR-0007): English and Nepali
       digits, empty, zero, negative, decimal, ≥ 1 crore, invalid.
 - [ ] `bun run type-check`, `bun run test` and `bun run build` pass.
-- [ ] Built CJS loaded with `node`; outputs match `use/dev/api/`.
+- [ ] Built CJS loaded with `node`; outputs match `user-guide/dev/api/`.
 
 ## Docs to update on implementation
 
 Living documents are snapshots of the package as it stands — edit them in place, never as a
 log of what changed (ADR-0002). Delete anything in them that is no longer true.
 
-- [ ] `use/dev/api/<domain>.mdx` — signature, options, example outputs
-- [ ] `use/dev/api/limitations.mdx` — if a limitation is fixed or introduced
-- [ ] `maintain/architecture/` · `use/dev/guides/` · `maintain/release/` · `maintain/security/` — whichever the
+- [ ] `user-guide/dev/api/<domain>.mdx` — signature, options, example outputs
+- [ ] `user-guide/dev/api/limitations.mdx` — if a limitation is fixed or introduced
+- [ ] `maintainer-guide/architecture/` · `user-guide/dev/guides/` · `maintainer-guide/release/` · `maintainer-guide/security/` — whichever the
       change requires
 - [ ] `README.md` — API summary, examples
 - [ ] `AGENTS.md` — <what changes, if the way we work changed>
-- [ ] `maintain/adr/index.mdx` — index row + status
+- [ ] `maintainer-guide/adr/index.mdx` — index row + status
 - [ ] Proposed commit message: `<type>: <summary>`

@@ -22,7 +22,7 @@ toNepaliCurrency(1234567.89)      // → "रू १२,३४,५६७.८९"
 
 > **Version note.** This README describes **v2** (`package.json` 2.0.0). npm's `latest` is
 > still **1.0.3**, whose API is different — run `npm view nepali-number version` to check.
-> Moving from v1? See the [migration guide](https://docs.nepal-dev.com/nepali-number/use/latest/guides/migration-v1-to-v2).
+> Moving from v1? See the [migration guide](https://docs.nepal-dev.com/nepali-number/user-guide/latest/guides/migration-v1-to-v2).
 
 ## Features
 
@@ -71,29 +71,29 @@ In the browser without a build step, the IIFE build exposes a global **`nepaliNu
 ```
 
 TypeScript declarations are included — no `@types` package needed. Details for every
-environment: [**Getting started**](https://docs.nepal-dev.com/nepali-number/use/latest/getting-started).
+environment: [**Getting started**](https://docs.nepal-dev.com/nepali-number/user-guide/latest/getting-started).
 
 ## API at a glance
 
 Every export is a named, pure function. Full reference with options, defaults and edge cases:
-[**API reference**](https://docs.nepal-dev.com/nepali-number/use/latest/api).
+[**API reference**](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api).
 
 ### Conversion
 
 | Function | Example |
 |---|---|
-| [`toNepali(input)`](https://docs.nepal-dev.com/nepali-number/use/latest/api/conversion#tonepaliinput) | `toNepali("Room 12B")` → `"Room १२B"` |
-| [`toEnglish(input)`](https://docs.nepal-dev.com/nepali-number/use/latest/api/conversion#toenglishinput) | `toEnglish("रू १,२३४")` → `"रू 1,234"` |
-| [`parseNepaliNumber(str)`](https://docs.nepal-dev.com/nepali-number/use/latest/api/conversion#parsenepalinumbernepalinumber) | `parseNepaliNumber("१२,३४५.६७")` → `12345.67` |
-| [`convert(text, toNepali = true)`](https://docs.nepal-dev.com/nepali-number/use/latest/api/conversion#converttext-tonepalinumber) | `convert("मेरो उमेर २५ वर्ष", false)` → `"मेरो उमेर 25 वर्ष"` |
+| [`toNepali(input)`](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/conversion#tonepaliinput) | `toNepali("Room 12B")` → `"Room १२B"` |
+| [`toEnglish(input)`](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/conversion#toenglishinput) | `toEnglish("रू १,२३४")` → `"रू 1,234"` |
+| [`parseNepaliNumber(str)`](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/conversion#parsenepalinumbernepalinumber) | `parseNepaliNumber("१२,३४५.६७")` → `12345.67` |
+| [`convert(text, toNepali = true)`](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/conversion#converttext-tonepalinumber) | `convert("मेरो उमेर २५ वर्ष", false)` → `"मेरो उमेर 25 वर्ष"` |
 
 ### Formatting
 
 | Function | Example |
 |---|---|
-| [`formatNepaliNumber(n, options?)`](https://docs.nepal-dev.com/nepali-number/use/latest/api/formatting#formatnepalinumbernumber-options) | `formatNepaliNumber(1234567.891)` → `"१२,३४,५६७.८९"` |
-| [`addNepaliCommas(n)`](https://docs.nepal-dev.com/nepali-number/use/latest/api/formatting#addnepalicommasnumber) | `addNepaliCommas(12345678)` → `"1,23,45,678"` |
-| [`removeFormatting(str)`](https://docs.nepal-dev.com/nepali-number/use/latest/api/formatting#removeformattingformattedstring) | `removeFormatting("रू १२,३४,५६७.८९")` → `1234567.89` |
+| [`formatNepaliNumber(n, options?)`](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/formatting#formatnepalinumbernumber-options) | `formatNepaliNumber(1234567.891)` → `"१२,३४,५६७.८९"` |
+| [`addNepaliCommas(n)`](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/formatting#addnepalicommasnumber) | `addNepaliCommas(12345678)` → `"1,23,45,678"` |
+| [`removeFormatting(str)`](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/formatting#removeformattingformattedstring) | `removeFormatting("रू १२,३४,५६७.८९")` → `1234567.89` |
 
 `formatNepaliNumber` options: `useNepaliDigits` (default `true`), `addCommas` (`true`),
 `precision` (`2`), `trimZero` (`true` — drops an all-zero decimal part).
@@ -108,17 +108,17 @@ formatNepaliNumber(0, { trimZero: false })                // → "०.००"
 
 | Function | Example |
 |---|---|
-| [`toNepaliWords(n)`](https://docs.nepal-dev.com/nepali-number/use/latest/api/words#tonepaliwordsnumber) | `toNepaliWords(123)` → `"एक सय तेईस"` |
-| [`toEnglishWords(n)`](https://docs.nepal-dev.com/nepali-number/use/latest/api/words#toenglishwordsnumber) | `toEnglishWords(12345678)` → `"one crore twenty three lakh forty five thousand six hundred seventy eight"` |
-| [`toNepaliOrdinal(n)`](https://docs.nepal-dev.com/nepali-number/use/latest/api/words#tonepaliordinalnumber) | `toNepaliOrdinal(1)` → `"पहिलो"`, `toNepaliOrdinal(5)` → `"पाँचौं"` |
-| [`toDecimalWord(n)`](https://docs.nepal-dev.com/nepali-number/use/latest/api/words#todecimalwordnumber) | `toDecimalWord(1200000)` → `"१२ लाख"`, `toDecimalWord(25000000)` → `"२.५० करोड"` |
+| [`toNepaliWords(n)`](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/words#tonepaliwordsnumber) | `toNepaliWords(123)` → `"एक सय तेईस"` |
+| [`toEnglishWords(n)`](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/words#toenglishwordsnumber) | `toEnglishWords(12345678)` → `"one crore twenty three lakh forty five thousand six hundred seventy eight"` |
+| [`toNepaliOrdinal(n)`](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/words#tonepaliordinalnumber) | `toNepaliOrdinal(1)` → `"पहिलो"`, `toNepaliOrdinal(5)` → `"पाँचौं"` |
+| [`toDecimalWord(n)`](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/words#todecimalwordnumber) | `toDecimalWord(1200000)` → `"१२ लाख"`, `toDecimalWord(25000000)` → `"२.५० करोड"` |
 
 ### Currency
 
 | Function | Example |
 |---|---|
-| [`toNepaliCurrency(n, options?)`](https://docs.nepal-dev.com/nepali-number/use/latest/api/currency#tonepalicurrencyamount-options) | `toNepaliCurrency(1234567.89)` → `"रू १२,३४,५६७.८९"` |
-| [`toNepaliCurrencyWords(n)`](https://docs.nepal-dev.com/nepali-number/use/latest/api/currency#tonepalicurrencywordsamount) | `toNepaliCurrencyWords(1234567.89)` → `"बाह्र लाख चौंतीस हजार पाँच सय सतसट्ठी रुपैयाँ उनान्नब्बे पैसा"` |
+| [`toNepaliCurrency(n, options?)`](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/currency#tonepalicurrencyamount-options) | `toNepaliCurrency(1234567.89)` → `"रू १२,३४,५६७.८९"` |
+| [`toNepaliCurrencyWords(n)`](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/currency#tonepalicurrencywordsamount) | `toNepaliCurrencyWords(1234567.89)` → `"बाह्र लाख चौंतीस हजार पाँच सय सतसट्ठी रुपैयाँ उनान्नब्बे पैसा"` |
 
 `toNepaliCurrency` options: `useNepaliDigits` (`true`), `showPaisa` (`true`),
 `currencySymbol` (`"रू"`), `precision` (`2`).
@@ -132,19 +132,19 @@ toNepaliCurrency(1234, { useNepaliDigits: false, currencySymbol: "Rs." })   // �
 
 | Function | Example |
 |---|---|
-| [`normalize(str)`](https://docs.nepal-dev.com/nepali-number/use/latest/api/utils#normalizeinput) | `normalize("  १२३  ४५६  ")` → `"१२३४५६"` |
-| [`detectNumberSystem(str)`](https://docs.nepal-dev.com/nepali-number/use/latest/api/utils#detectnumbersysteminput) | `"1234"` → `"english"`, `"१२३४"` → `"nepali"`, `"12३४"` → `"mixed"`, `"abcd"` → `NaN` |
-| [`validateNepaliNumber(str)`](https://docs.nepal-dev.com/nepali-number/use/latest/api/utils#validatenepalinumberinput) | `"१२३.४५"` → `true`, `"१२३.४५.६"` → `false` |
-| [`isNepaliDigit(char)`](https://docs.nepal-dev.com/nepali-number/use/latest/api/utils#isnepalidigitchar) | `"५"` → `true` |
-| [`isEnglishDigit(char)`](https://docs.nepal-dev.com/nepali-number/use/latest/api/utils#isenglishdigitchar) | `"5"` → `true` |
-| [`isMixedNumber(str)`](https://docs.nepal-dev.com/nepali-number/use/latest/api/utils#ismixednumberinput) | `"12३४"` → `true` |
-| [`padZeros(n, length)`](https://docs.nepal-dev.com/nepali-number/use/latest/api/utils#padzerosnumber-length) | `padZeros(42, 5)` → `"०००४२"` |
-| [`roundNepali(n, decimals = 2)`](https://docs.nepal-dev.com/nepali-number/use/latest/api/utils#roundnepalinumber-decimals) | `roundNepali(3.14159)` → `"३.१४"` |
+| [`normalize(str)`](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/utils#normalizeinput) | `normalize("  १२३  ४५६  ")` → `"१२३४५६"` |
+| [`detectNumberSystem(str)`](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/utils#detectnumbersysteminput) | `"1234"` → `"english"`, `"१२३४"` → `"nepali"`, `"12३४"` → `"mixed"`, `"abcd"` → `NaN` |
+| [`validateNepaliNumber(str)`](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/utils#validatenepalinumberinput) | `"१२३.४५"` → `true`, `"१२३.४५.६"` → `false` |
+| [`isNepaliDigit(char)`](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/utils#isnepalidigitchar) | `"५"` → `true` |
+| [`isEnglishDigit(char)`](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/utils#isenglishdigitchar) | `"5"` → `true` |
+| [`isMixedNumber(str)`](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/utils#ismixednumberinput) | `"12३४"` → `true` |
+| [`padZeros(n, length)`](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/utils#padzerosnumber-length) | `padZeros(42, 5)` → `"०००४२"` |
+| [`roundNepali(n, decimals = 2)`](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/utils#roundnepalinumber-decimals) | `roundNepali(3.14159)` → `"३.१४"` |
 
 ## Good to know
 
 A few behaviours surprise people. The full list, with a workaround for each, is in
-[**limitations**](https://docs.nepal-dev.com/nepali-number/use/latest/api/limitations).
+[**limitations**](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/limitations).
 
 - **Strip commas before formatting a string** — `formatNepaliNumber("1,234")` → `"१"`; use
   `formatNepaliNumber(removeFormatting("1,234"))` → `"१,२३४"`.
@@ -154,18 +154,18 @@ A few behaviours surprise people. The full list, with a workaround for each, is 
   difference matters.
 - **Option types aren't exported yet** — derive them:
   `type FormatOptions = NonNullable<Parameters<typeof formatNepaliNumber>[1]>`
-  ([types](https://docs.nepal-dev.com/nepali-number/use/latest/api/types)).
+  ([types](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/types)).
 
 ## Documentation
 
 | | |
 |---|---|
-| [Getting started](https://docs.nepal-dev.com/nepali-number/use/latest/getting-started) | Install and import in Node, Bun, Deno, bundlers, TypeScript, the browser |
-| [Recipes](https://docs.nepal-dev.com/nepali-number/use/latest/guides/recipes) | Reading typed input, displaying amounts, cheques in words, React and Vue helpers |
-| [API reference](https://docs.nepal-dev.com/nepali-number/use/latest/api) | Every export: signature, options, defaults, outputs |
-| [Limitations](https://docs.nepal-dev.com/nepali-number/use/latest/api/limitations) | Edge cases and workarounds |
-| [Migrating from v1](https://docs.nepal-dev.com/nepali-number/use/latest/guides/migration-v1-to-v2) | v1 function → v2 function |
-| [Versioning](https://docs.nepal-dev.com/nepali-number/maintain/release/versioning) | What counts as a breaking change |
+| [Getting started](https://docs.nepal-dev.com/nepali-number/user-guide/latest/getting-started) | Install and import in Node, Bun, Deno, bundlers, TypeScript, the browser |
+| [Recipes](https://docs.nepal-dev.com/nepali-number/user-guide/latest/guides/recipes) | Reading typed input, displaying amounts, cheques in words, React and Vue helpers |
+| [API reference](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api) | Every export: signature, options, defaults, outputs |
+| [Limitations](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/limitations) | Edge cases and workarounds |
+| [Migrating from v1](https://docs.nepal-dev.com/nepali-number/user-guide/latest/guides/migration-v1-to-v2) | v1 function → v2 function |
+| [Versioning](https://docs.nepal-dev.com/nepali-number/maintainer-guide/release/versioning) | What counts as a breaking change |
 | [All documentation](https://docs.nepal-dev.com/nepali-number/maintain) | The map, including architecture, decisions and security |
 
 ## Contributing
@@ -174,9 +174,9 @@ Issues and pull requests are welcome. Read [**`AGENTS.md`**](AGENTS.md) first �
 working agreement for everyone, human or AI.
 
 In short: **every feature and functional change starts with an ADR** in
-[decision records](https://docs.nepal-dev.com/nepali-number/maintain/adr) that the owner approves before code is written. Any change a
+[decision records](https://docs.nepal-dev.com/nepali-number/maintainer-guide/adr) that the owner approves before code is written. Any change a
 consumer can observe — including a changed word or spelling — ships its
-[API reference](https://docs.nepal-dev.com/nepali-number/use/latest/api) update and a semver decision with it. Tests are part of
+[API reference](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api) update and a semver decision with it. Tests are part of
 every change. Unclear Nepali-language or rounding questions are asked, not guessed.
 
 ```bash
@@ -205,7 +205,7 @@ src/
 ```
 
 **Security issues:** please report privately to <info@puncoz.com> rather than in a public
-issue ([security](https://docs.nepal-dev.com/nepali-number/maintain/security)).
+issue ([security](https://docs.nepal-dev.com/nepali-number/maintainer-guide/security)).
 
 ## License
 

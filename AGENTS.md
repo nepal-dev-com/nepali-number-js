@@ -21,15 +21,15 @@ declarations, so the same code runs in Node.js, Bun, Deno, bundlers and a plain 
 - The overview, installation and examples for consumers are in [`README.md`](README.md).
 - **The documentation is published on Nepal Dev Verse**, at
   [docs.nepal-dev.com/nepali-number](https://docs.nepal-dev.com/nepali-number), and written in
-  a git submodule of this repository (§8). In this file a path that starts with `use/` or
-  `maintain/` is relative to `docs/docs.nepal-dev.com/content/nepali-number/`. The documentation map is
-  [`maintain/index.mdx`](docs/docs.nepal-dev.com/content/nepali-number/maintain/index.mdx).
-- The **public API** is the product. Its reference lives in [`use/dev/api/`](docs/docs.nepal-dev.com/content/nepali-number/use/dev/api/index.mdx);
-  its known limitations in [`use/dev/api/limitations.mdx`](docs/docs.nepal-dev.com/content/nepali-number/use/dev/api/limitations.mdx).
+  a git submodule of this repository (§8). In this file a path that starts with `user-guide/` or
+  `maintainer-guide/` is relative to `docs/docs.nepal-dev.com/content/nepali-number/`. The documentation map is
+  [`maintainer-guide/index.mdx`](docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/index.mdx).
+- The **public API** is the product. Its reference lives in [`user-guide/dev/api/`](docs/docs.nepal-dev.com/content/nepali-number/user-guide/dev/api/index.mdx);
+  its known limitations in [`user-guide/dev/api/limitations.mdx`](docs/docs.nepal-dev.com/content/nepali-number/user-guide/dev/api/limitations.mdx).
 
 **Current state:** `package.json` is at `2.0.0`, but npm's `latest` is still **1.0.3** — no
 2.x has been published, and the release workflow cannot publish yet
-([`maintain/release/releasing.mdx`](docs/docs.nepal-dev.com/content/nepali-number/maintain/release/releasing.mdx#current-gaps)). 21 functions are exported across five domains
+([`maintainer-guide/release/releasing.mdx`](docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/release/releasing.mdx#current-gaps)). 21 functions are exported across five domains
 (conversion, formatting, words, currency, utils). The option and result types
 (`FormatOptions`, `CurrencyOptions`, `NumberSystem`) exist in `src/*/types.ts` but are **not**
 re-exported, so consumers cannot import them yet. 149 tests pass; `bun run type-check` and
@@ -40,17 +40,17 @@ fallbacks in `src/words/words.ts`.
 
 **Every feature and functional change starts with an ADR, and no implementation begins
 before the repository owner approves it.** The full decision is
-[ADR-0001](docs/docs.nepal-dev.com/content/nepali-number/maintain/adr/ADR-0001-adr-driven-development-workflow.mdx).
+[ADR-0001](docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/adr/ADR-0001-adr-driven-development-workflow.mdx).
 
 ### Workflow
 
 1. **Propose.** Start from [`docs/_templates/adr.md`](docs/_templates/adr.md) and write
-   `maintain/adr/ADR-NNNN-kebab-title.mdx`, in the page format of §8, using the *next free number* from
-   [`maintain/adr/index.mdx`](docs/docs.nepal-dev.com/content/nepali-number/maintain/adr/index.mdx). Set **`Status: Proposed`** and add the index
+   `maintainer-guide/adr/ADR-NNNN-kebab-title.mdx`, in the page format of §8, using the *next free number* from
+   [`maintainer-guide/adr/index.mdx`](docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/adr/index.mdx). Set **`Status: Proposed`** and add the index
    row straight away, so ADRs in flight cannot collide on a number.
    **If the change touches the public API, write its reference in the same change**
-   ([ADR-0008](docs/docs.nepal-dev.com/content/nepali-number/maintain/adr/ADR-0008-public-api-changes-ship-their-reference.mdx)): the affected
-   `use/dev/api/<domain>.mdx` page, with the signature, defaults and example outputs the change
+   ([ADR-0008](docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/adr/ADR-0008-public-api-changes-ship-their-reference.mdx)): the affected
+   `user-guide/dev/api/<domain>.mdx` page, with the signature, defaults and example outputs the change
    will produce. See *Public API reference* below.
 2. **Stop.** Do not write library code. Tell the owner the ADR, and its API reference if it has
    one, are ready for review.
@@ -80,8 +80,8 @@ Unclear which side the change falls on? It needs an ADR.
 
 ### Public API reference — required with every ADR that changes the API
 
-[ADR-0008](docs/docs.nepal-dev.com/content/nepali-number/maintain/adr/ADR-0008-public-api-changes-ship-their-reference.mdx). An ADR that adds or
-changes anything a consumer can import or observe ships the updated `use/dev/api/<domain>.mdx`,
+[ADR-0008](docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/adr/ADR-0008-public-api-changes-ship-their-reference.mdx). An ADR that adds or
+changes anything a consumer can import or observe ships the updated `user-guide/dev/api/<domain>.mdx`,
 and the two are reviewed together. For each affected export it shows:
 
 - **the signature** exactly as it will appear in `dist/nepali-number.d.ts`;
@@ -89,7 +89,7 @@ and the two are reviewed together. For each affected export it shows:
 - **example outputs** — typical input, English and Nepali digits, zero, negative, decimal,
   large (≥ 1 crore), and invalid input — as the code will produce them;
 - **the semver impact**: patch, minor or major, and why
-  ([`maintain/release/versioning.mdx`](docs/docs.nepal-dev.com/content/nepali-number/maintain/release/versioning.mdx)).
+  ([`maintainer-guide/release/versioning.mdx`](docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/release/versioning.mdx)).
 
 Not needed for a change no consumer can observe. Unsure whether one could? Write it.
 Template: [`docs/_templates/api.md`](docs/_templates/api.md).
@@ -106,10 +106,10 @@ Template: [`docs/_templates/api.md`](docs/_templates/api.md).
 - **Don't stop for per-change review.** Once an ADR is approved, carry out *all* the work it
   covers, end to end. The owner reviews the finished set, not each step.
 - **Keep docs in the same change.** An implementation is incomplete until `AGENTS.md`,
-  `README.md`, `use/dev/api/` and the other affected documents reflect it (§8).
+  `README.md`, `user-guide/dev/api/` and the other affected documents reflect it (§8).
 - **Keep tests in the same change.** A change is not complete without tests for its happy path
   and its obvious failure paths — small changes included
-  ([ADR-0007](docs/docs.nepal-dev.com/content/nepali-number/maintain/adr/ADR-0007-tests-are-part-of-every-change.mdx)). A bug fix starts with a
+  ([ADR-0007](docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/adr/ADR-0007-tests-are-part-of-every-change.mdx)). A bug fix starts with a
   test that fails for the bug's reason.
 - **Never edit `dist/` or `coverage/`.** Both are generated and git-ignored.
 - **`sample/` is reference material** copied from another project. It is not part of this
@@ -121,7 +121,7 @@ Template: [`docs/_templates/api.md`](docs/_templates/api.md).
 
 ## 4. Never guess — ask
 
-[ADR-0004](docs/docs.nepal-dev.com/content/nepali-number/maintain/adr/ADR-0004-ask-never-guess.mdx). Picking something plausible and moving on
+[ADR-0004](docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/adr/ADR-0004-ask-never-guess.mdx). Picking something plausible and moving on
 is the failure mode this rule exists to stop: the assumption looks finished, gives no signal
 it was made, and is found late. In a language library a plausible wrong guess — a spelling, an
 ordinal form, a scale name, a rounding rule — ships to every consumer and becomes something
@@ -170,7 +170,7 @@ What is installed **today** (verified from `package.json`, the lockfile and the 
 | Dev dependencies | `typescript`, `tsdown`, `@types/bun`, `del-cli` |
 | Package manager | Bun (1.4.4 locally; CI uses `latest`); `bun.lock` is committed |
 | CI | `.github/workflows/ci.yml`: type-check, test, build on Node 20 / 22 / 24; Codecov upload; pack-and-require smoke test |
-| Release | `.github/workflows/release.yml`: runs `bun run release` after CI passes on `main`, `beta`, `alpha` — see [`maintain/release/releasing.mdx`](docs/docs.nepal-dev.com/content/nepali-number/maintain/release/releasing.mdx) for its current gaps |
+| Release | `.github/workflows/release.yml`: runs `bun run release` after CI passes on `main`, `beta`, `alpha` — see [`maintainer-guide/release/releasing.mdx`](docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/release/releasing.mdx) for its current gaps |
 | Linting / formatting | **None installed.** Adopting one is a tooling ADR |
 
 - **Read the installed tool, not recall.** tsdown is pre-1.0 and changes between minors;
@@ -183,7 +183,7 @@ What is installed **today** (verified from `package.json`, the lockfile and the 
   returns `T | undefined`: guard it or fall back (`NEPALI_WORDS[n] || ""`), as the existing code
   does.
 - **Dependencies between domains point one way**, as drawn in
-  [`maintain/architecture/system.mdx`](docs/docs.nepal-dev.com/content/nepali-number/maintain/architecture/system.mdx): `constants` ← `conversion` ←
+  [`maintainer-guide/architecture/system.mdx`](docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/architecture/system.mdx): `constants` ← `conversion` ←
   `formatting` ← `utils` ← `words` ← `currency`. A new import that points back up, or creates a
   cycle, needs an ADR.
 
@@ -200,7 +200,7 @@ What is installed **today** (verified from `package.json`, the lockfile and the 
    re-exported (`export type * from "./types"`) — today's `index.ts` files do not do this, which
    is why the existing option types are unreachable for consumers.
 5. **Test** in `src/<domain>/<domain>.test.ts`, importing from `"."` (§ ADR-0007 for coverage).
-6. **Document** in `use/dev/api/<domain>.mdx` and the README's API summary.
+6. **Document** in `user-guide/dev/api/<domain>.mdx` and the README's API summary.
 7. **Verify**: `bun run type-check`, `bun run test`, `bun run build`, then load the built CJS
    file with `node` and check the new export's outputs match the docs.
 
@@ -222,7 +222,7 @@ Run `bun run type-check`, `bun run test` and `bun run build` before declaring wo
 ### Commit messages (proposed by agents, made by the owner)
 
 [Conventional Commits](https://www.conventionalcommits.org). The prefix carries the semver
-intent ([`maintain/release/versioning.mdx`](docs/docs.nepal-dev.com/content/nepali-number/maintain/release/versioning.mdx)):
+intent ([`maintainer-guide/release/versioning.mdx`](docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/release/versioning.mdx)):
 
 | Prefix | Bump | Use for |
 |---|---|---|
@@ -235,7 +235,7 @@ intent ([`maintain/release/versioning.mdx`](docs/docs.nepal-dev.com/content/nepa
 ## 6. Package invariants
 
 These hold for every change. Departing from one needs an ADR that says so
-([ADR-0009](docs/docs.nepal-dev.com/content/nepali-number/maintain/adr/ADR-0009-package-invariants.mdx)).
+([ADR-0009](docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/adr/ADR-0009-package-invariants.mdx)).
 
 1. **Zero runtime dependencies.** `dependencies` and `peerDependencies` stay empty. Nothing in
    `src/` imports a third-party package.
@@ -247,7 +247,7 @@ These hold for every change. Departing from one needs an ADR that says so
 4. **No throwing for declared input types.** For any value of its declared parameter types a
    function returns a value; invalid content yields a documented safe default (`""`, `0`,
    `"०"`, `NaN`, `false`). The default is part of the contract and is documented in
-   `use/dev/api/`.
+   `user-guide/dev/api/`.
 5. **Output strings are the contract.** Consumers render and compare them. Any change to what
    an export returns for an existing input is a semver decision (ADR-0008).
 6. **Language data has one home.** Digits, words, ordinals and scales live in
@@ -260,7 +260,7 @@ These hold for every change. Departing from one needs an ADR that says so
 
 ## 7. Code style
 
-[ADR-0003](docs/docs.nepal-dev.com/content/nepali-number/maintain/adr/ADR-0003-code-comment-policy.mdx). **Comments explain *why*. The code
+[ADR-0003](docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/adr/ADR-0003-code-comment-policy.mdx). **Comments explain *why*. The code
 explains *what*. If the code is self-explanatory, write no comment at all.**
 
 A comment is warranted only when the reasoning, trade-off, edge case or constraint cannot be
@@ -294,8 +294,11 @@ const cleaned = input.replace(/,/g, "")
 
 ## 8. Documentation duties
 
-[ADR-0002](docs/docs.nepal-dev.com/content/nepali-number/maintain/adr/ADR-0002-living-design-documentation.mdx). [ADR-0010](docs/docs.nepal-dev.com/content/nepali-number/maintain/adr/ADR-0010-documentation-lives-in-nepal-dev-verse.mdx).
-The map of what lives where is [`maintain/index.mdx`](docs/docs.nepal-dev.com/content/nepali-number/maintain/index.mdx); each directory's
+[ADR-0002](docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/adr/ADR-0002-living-design-documentation.mdx). [ADR-0010](docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/adr/ADR-0010-documentation-lives-in-nepal-dev-verse.mdx).
+The two tracks are named **User guide** and **Maintainer guide**, in the folders `user-guide/` and
+`maintainer-guide/`, by the documentation site's ADR-0048; ADR-0010 still writes them *Use* and
+*Maintain*, `use/` and `maintain/`.
+The map of what lives where is [`maintainer-guide/index.mdx`](docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/index.mdx); each directory's
 `index.mdx` holds its own conventions.
 
 ### Documentation (git submodule)
@@ -303,17 +306,17 @@ The map of what lives where is [`maintain/index.mdx`](docs/docs.nepal-dev.com/co
 `docs/docs.nepal-dev.com/` is the puncoz-packages-docs repository, where this project's documentation
 is published. Before changing anything in it, read `docs/docs.nepal-dev.com/PROJECT_AGENTS.md` and follow
 it. In short: edit only `docs/docs.nepal-dev.com/content/nepali-number/` and
-`docs/docs.nepal-dev.com/diagrams/nepali-number/`; keep both the Use docs (for users, versioned) and the
-Maintain docs (for maintainers, not versioned) current in the same change as the code; give every
+`docs/docs.nepal-dev.com/diagrams/nepali-number/`; keep both the User guide docs (for users, versioned) and the
+Maintainer guide docs (for maintainers, not versioned) current in the same change as the code; give every
 diagram both a Mermaid fence and its Archify view; give every page a frontmatter `description`,
 written for someone reading a search result; never commit, push or switch branches inside the
 submodule; never put private content there; ask the owner when anything is unclear.
 
 | Track | Folder under `content/nepali-number/` | Holds |
 |---|---|---|
-| **Use** | `use/dev/` | User docs for unreleased work on `main`: getting started, `guides/`, `api/`. **New and changed behaviour is written here.** |
-| **Use** | `use/v2/` | The released 2.x line, marked `latest`. It keeps describing its version: only mistakes are corrected. |
-| **Maintain** | `maintain/` | `adr/`, `architecture/`, `release/`, `security/`. Not versioned: describes `main`. |
+| **User guide** | `user-guide/dev/` | User docs for unreleased work on `main`: getting started, `guides/`, `api/`. **New and changed behaviour is written here.** |
+| **User guide** | `user-guide/v2/` | The released 2.x line, marked `latest`. It keeps describing its version: only mistakes are corrected. |
+| **Maintainer guide** | `maintainer-guide/` | `adr/`, `architecture/`, `release/`, `security/`. Not versioned: describes `main`. |
 
 The owner commits inside the submodule and moves its pointer; agents list the files they
 changed there and hand over the commands in `PROJECT_AGENTS.md` §10.
@@ -322,15 +325,15 @@ changed there and hand over the commands in `PROJECT_AGENTS.md` §10.
 
 | Kind | Where | Rule |
 |---|---|---|
-| **Decisions** | `maintain/adr/` | Immutable once approved. Superseded, never edited. |
-| **Living documents** | `README.md`, the Use track and everything else in `maintain/` | Describe the package **as it stands right now**, and are edited in place. |
+| **Decisions** | `maintainer-guide/adr/` | Immutable once approved. Superseded, never edited. |
+| **Living documents** | `README.md`, the User guide and everything else in `maintainer-guide/` | Describe the package **as it stands right now**, and are edited in place. |
 
 ### Living documents are snapshots, not changelogs
 
 No revision tables. No "previously X, now Y". No strikethrough, no "new in v2". **What is no
 longer true is deleted, not annotated.** Anyone opening the file sees the current package and
 nothing else — git, the ADRs and the GitHub release notes hold the history. The one exception
-is [`use/dev/guides/migration-v1-to-v2.mdx`](docs/docs.nepal-dev.com/content/nepali-number/use/dev/guides/migration-v1-to-v2.mdx), whose subject *is*
+is [`user-guide/dev/guides/migration-v1-to-v2.mdx`](docs/docs.nepal-dev.com/content/nepali-number/user-guide/dev/guides/migration-v1-to-v2.mdx), whose subject *is*
 the difference between two versions.
 
 **Every example output is real.** Run it against the built package before writing it down. An
@@ -343,12 +346,12 @@ moves.
 
 | Document | Directory | Required when |
 |---|---|---|
-| **API reference** | `use/dev/api/` | **Any change a consumer can observe (§2, ADR-0008)** |
-| Limitations | `use/dev/api/limitations.mdx` | A limitation is found, fixed, or introduced |
-| Architecture | `maintain/architecture/` | A new domain, a new cross-domain import, or a change to the build, formats or `exports` map |
-| Guides | `use/dev/guides/` | A new way to use the package, a new runtime, or a breaking change that needs a migration path |
-| Versioning / releasing | `maintain/release/` | The semver policy, CI, or release process changes |
-| Security | `maintain/security/` | The change touches the supply chain, CI secrets, publishing, or adds input handling worth its own analysis |
+| **API reference** | `user-guide/dev/api/` | **Any change a consumer can observe (§2, ADR-0008)** |
+| Limitations | `user-guide/dev/api/limitations.mdx` | A limitation is found, fixed, or introduced |
+| Architecture | `maintainer-guide/architecture/` | A new domain, a new cross-domain import, or a change to the build, formats or `exports` map |
+| Guides | `user-guide/dev/guides/` | A new way to use the package, a new runtime, or a breaking change that needs a migration path |
+| Versioning / releasing | `maintainer-guide/release/` | The semver policy, CI, or release process changes |
+| Security | `maintainer-guide/security/` | The change touches the supply chain, CI secrets, publishing, or adds input handling worth its own analysis |
 
 Judgement applies — a small change may need none of them. **If it is unclear whether one is
 required, write it.** Start from [`docs/_templates/`](docs/_templates/), and write the page as
@@ -361,19 +364,19 @@ Archify view in the submodule's `diagrams/nepali-number/`. No binary or external
 
 | File | Update when |
 |---|---|
-| `use/dev/api/` | An export's signature, default, output or limitation changes. An implementation is **not complete** while the reference contradicts it. |
+| `user-guide/dev/api/` | An export's signature, default, output or limitation changes. An implementation is **not complete** while the reference contradicts it. |
 | `README.md` | What the package does, how to install or import it, or its API summary changes. README is what npm shows. |
 | `AGENTS.md` (this file) | The way work is done changes — conventions, commands, structure, rules, stack |
-| `maintain/adr/index.mdx` | An ADR is written or changes status — keep the index and the next free number accurate |
+| `maintainer-guide/adr/index.mdx` | An ADR is written or changes status — keep the index and the next free number accurate |
 
 ## 9. Security and supply chain
 
-[ADR-0005](docs/docs.nepal-dev.com/content/nepali-number/maintain/adr/ADR-0005-security-as-a-standing-practice.mdx). This package holds no data,
+[ADR-0005](docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/adr/ADR-0005-security-as-a-standing-practice.mdx). This package holds no data,
 makes no network calls and reads no secrets. Its risk is **what it can do inside every
 application that installs it**: a compromised release, a malicious dependency, or a regular
 expression that hangs a server on crafted input reaches every consumer at once.
 
-Full documents live in [`maintain/security/`](docs/docs.nepal-dev.com/content/nepali-number/maintain/security/index.mdx).
+Full documents live in [`maintainer-guide/security/`](docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/security/index.mdx).
 
 ### Never guess at a security decision
 
@@ -393,7 +396,7 @@ npm provenance — **the owner decides, and it is recorded** (§4).
 
 ### Full audits at gates
 
-The audit in [`maintain/security/checklist.mdx`](docs/docs.nepal-dev.com/content/nepali-number/maintain/security/checklist.mdx) runs **before each
+The audit in [`maintainer-guide/security/checklist.mdx`](docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/security/checklist.mdx) runs **before each
 release**. Findings are reported as: what it is · where it is · how it would be exploited · the
 fix.
 
@@ -401,7 +404,7 @@ fix.
 
 - **No secret is ever a string literal** — not in source, config, workflows, comments or tests.
   CI secrets live in GitHub repository secrets, listed in
-  [`maintain/security/secrets.mdx`](docs/docs.nepal-dev.com/content/nepali-number/maintain/security/secrets.mdx).
+  [`maintainer-guide/security/secrets.mdx`](docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/security/secrets.mdx).
 - **The published tarball contains only what consumers need.**
 - **Nothing runs on install.** The package never has lifecycle scripts that execute on a
   consumer's machine.
@@ -421,9 +424,9 @@ fix.
 │       ├── PROJECT_AGENTS.md         # the rules for writing documentation there
 │       ├── content/nepali-number/
 │       │   ├── index.mdx             # the overview
-│       │   ├── use/dev/              # user docs for main: getting started, guides/, api/
-│       │   ├── use/v2/               # user docs for the released 2.x line
-│       │   └── maintain/             # adr/, architecture/, release/, security/
+│       │   ├── user-guide/dev/       # user docs for main: getting started, guides/, api/
+│       │   ├── user-guide/v2/        # user docs for the released 2.x line
+│       │   └── maintainer-guide/     # adr/, architecture/, release/, security/
 │       └── diagrams/nepali-number/   # each diagram's Archify view and its source
 ├── src/
 │   ├── nepali-number.ts   # public barrel — the only build entry
@@ -448,11 +451,11 @@ domain exports a type.
 
 ## 11. Quick checklist
 
-- [ ] Read `AGENTS.md`, [`maintain/index.mdx`](docs/docs.nepal-dev.com/content/nepali-number/maintain/index.mdx), the relevant ADRs and the
-      `use/dev/api/` pages for the exports involved.
+- [ ] Read `AGENTS.md`, [`maintainer-guide/index.mdx`](docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/index.mdx), the relevant ADRs and the
+      `user-guide/dev/api/` pages for the exports involved.
 - [ ] Which skills fit this task? Load only those, and name them — process skills first (§12).
 - [ ] Does this need an ADR? If yes — write it, `Status: Proposed`, index it, and stop.
-- [ ] Does a consumer see a difference? Then write the `use/dev/api/` change with it, with real
+- [ ] Does a consumer see a difference? Then write the `user-guide/dev/api/` change with it, with real
       example outputs and the semver impact.
 - [ ] Any undetermined language, rounding or naming decision? Ask with options and a
       recommendation (§4).
@@ -461,7 +464,7 @@ domain exports a type.
 - [ ] Complete the whole approved scope in one pass.
 - [ ] TSDoc on every export touched; other comments only where they explain *why* (§7).
 - [ ] Security: run the per-change rows that apply (§9). Any doubt → ask, never assume.
-- [ ] `use/dev/api/`, `README.md`, `AGENTS.md`, `maintain/adr/index.mdx` updated as needed; every
+- [ ] `user-guide/dev/api/`, `README.md`, `AGENTS.md`, `maintainer-guide/adr/index.mdx` updated as needed; every
       example output checked against the build.
 - [ ] Tests written or updated — happy path **and** the obvious failures (ADR-0007).
 - [ ] `bun run type-check`, `bun run test` and `bun run build` pass.
@@ -469,7 +472,7 @@ domain exports a type.
 
 ## 12. Skills
 
-[ADR-0006](docs/docs.nepal-dev.com/content/nepali-number/maintain/adr/ADR-0006-agent-skills-are-advisory.mdx). Contributors here — human and AI —
+[ADR-0006](docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/adr/ADR-0006-agent-skills-are-advisory.mdx). Contributors here — human and AI —
 may have installed **skills**: packaged workflows for brainstorming, debugging, TDD, code
 review, TypeScript and more. **Use them.** Left alone, they go unused, and the same task gets a
 rigorous treatment one day and an ad-hoc one the next.
@@ -479,9 +482,9 @@ They are recommendations about *method*. This file is *authority*.
 ### 12.1 Order of precedence
 
 ```
-1. AGENTS.md, maintain/  binding   — ADRs, design documents, this working agreement
-2. Skills                advisory  — invoke freely; follow unless (1) says otherwise
-3. Default behaviour     last      — only where neither of the above covers the situation
+1. AGENTS.md, maintainer-guide/  binding   — ADRs, design documents, this working agreement
+2. Skills                        advisory  — invoke freely; follow unless (1) says otherwise
+3. Default behaviour             last      — only where neither of the above covers the situation
 ```
 
 **A skill never grants permission this repository withholds:**
@@ -492,7 +495,7 @@ They are recommendations about *method*. This file is *authority*.
 | `git commit`, `git push`, tags, rebase, or switching branches | §3 |
 | `npm publish`, `npm version`, or editing the package version | §3 |
 | Adding a dependency, or changing build / test / CI / release tooling | §2 · §6 |
-| A documentation layout other than the Use and Maintain tracks and `docs/_templates/`, including a skill's own spec or plan folder | §8 · ADR-0002 · ADR-0010 |
+| A documentation layout other than the User guide and the Maintainer guide and `docs/_templates/`, including a skill's own spec or plan folder | §8 · ADR-0002 · ADR-0010 |
 | Changing an export's output without a semver decision | §6 · ADR-0008 |
 | Explanatory *what*-comments, banners, or `=====` section headers | §7 · ADR-0003 |
 | Deciding a Nepali-language, rounding or security question on the owner's behalf | §4 · §9 · ADR-0004 · ADR-0005 |
@@ -516,9 +519,9 @@ violation is invisible in the diff, because the diff looks like good work.
 ### 12.3 Skills stop at the gate
 
 ```
-brainstorming ──> ADR (Proposed) + use/dev/api ──> OWNER APPROVES ──> implementation skills
-                                                       ▲
-                                    nothing crosses this line without it
+brainstorming ──> ADR (Proposed) + user-guide/dev/api ──> OWNER APPROVES ──> implementation skills
+                                                              ▲
+                                           nothing crosses this line without it
 ```
 
 A skill whose workflow ends with "now implement" ends, here, at `Status: Proposed`. A skill
