@@ -1,0 +1,3 @@
+[submodule "docs/docs.nepal-dev.com"]
+	path = docs/docs.nepal-dev.com
+	url = git@github.com:puncoz/docs.nepal-dev.com.git
