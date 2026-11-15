@@ -50,6 +50,20 @@ describe("Conversion Functions", () => {
       expect(toNepali(largeNumber)).toBe(expected)
     })
 
+    test("writes numbers in full and accepts bigint", () => {
+      expect(toNepali(1e21)).toBe("१०००००००००००००००००००००")
+      expect(toNepali(1.5e-7)).toBe("०.००००००१५")
+      expect(toNepali(-1e21)).toBe("-१०००००००००००००००००००००")
+      expect(toNepali(123n)).toBe("१२३")
+      expect(toNepali(NaN)).toBe("NaN")
+      expect(toNepali(Infinity)).toBe("Infinity")
+    })
+
+    test("returns an empty string for null and undefined", () => {
+      expect(toNepali(null as unknown as string)).toBe("")
+      expect(toNepali(undefined as unknown as string)).toBe("")
+    })
+
     test("preserves nepali-digits", () => {
       expect(toNepali("१२३")).toBe("१२३")
       expect(toNepali("१२45३")).toBe("१२४५३")
@@ -93,6 +107,12 @@ describe("Conversion Functions", () => {
       expect(toEnglish("!@#$%^&*()")).toBe("!@#$%^&*()")
     })
 
+    test("accepts numbers and bigint, and null from JavaScript", () => {
+      expect(toEnglish(123)).toBe("123")
+      expect(toEnglish(123n)).toBe("123")
+      expect(toEnglish(null as unknown as string)).toBe("")
+    })
+
     test("preserves english-digits", () => {
       expect(toEnglish("123")).toBe("123")
       expect(toEnglish("१२45३")).toBe("12453")
@@ -129,12 +149,51 @@ describe("Conversion Functions", () => {
       expect(parseNepaliNumber("१२ ३४")).toBe(1234)
     })
 
-    test("returns 0 for invalid inputs", () => {
-      expect(parseNepaliNumber("")).toBe(0)
-      expect(parseNepaliNumber("abc")).toBe(0)
-      expect(parseNepaliNumber("१२३abc")).toBe(123)
-      expect(parseNepaliNumber("invalid")).toBe(0)
-      expect(parseNepaliNumber("   ")).toBe(0)
+    test("returns NaN for input that is not wholly a number", () => {
+      expect(parseNepaliNumber("")).toBeNaN()
+      expect(parseNepaliNumber("abc")).toBeNaN()
+      expect(parseNepaliNumber("१२३abc")).toBeNaN()
+      expect(parseNepaliNumber("12abc")).toBeNaN()
+      expect(parseNepaliNumber("   ")).toBeNaN()
+      expect(parseNepaliNumber(".")).toBeNaN()
+      expect(parseNepaliNumber("1.2.3")).toBeNaN()
+      expect(parseNepaliNumber("1e3")).toBeNaN()
+      expect(parseNepaliNumber("रू ५००")).toBeNaN()
+      expect(parseNepaliNumber("१,")).toBeNaN()
+      expect(parseNepaliNumber(",१")).toBeNaN()
+      expect(parseNepaliNumber("- 5")).toBeNaN()
+      expect(parseNepaliNumber("--5")).toBeNaN()
+      expect(parseNepaliNumber("1.2,3")).toBeNaN()
+      expect(parseNepaliNumber(NaN)).toBeNaN()
+      expect(parseNepaliNumber(Infinity)).toBeNaN()
+      expect(parseNepaliNumber(-Infinity)).toBeNaN()
+    })
+
+    test("returns NaN for null and undefined passed from JavaScript", () => {
+      expect(parseNepaliNumber(null as unknown as string)).toBeNaN()
+      expect(parseNepaliNumber(undefined as unknown as string)).toBeNaN()
+    })
+
+    test("reads signs, mixed digits, numbers and bigints", () => {
+      expect(parseNepaliNumber("-१,२३४.५")).toBe(-1234.5)
+      expect(parseNepaliNumber("\u2212५")).toBe(-5)
+      expect(parseNepaliNumber("+५")).toBe(5)
+      expect(parseNepaliNumber("12३")).toBe(123)
+      expect(parseNepaliNumber(123n)).toBe(123)
+      expect(parseNepaliNumber(-12.5)).toBe(-12.5)
+      expect(parseNepaliNumber(1e21)).toBe(1e21)
+      expect(parseNepaliNumber(1.5e-7)).toBe(1.5e-7)
+      expect(parseNepaliNumber(-0)).toBe(0)
+      expect(parseNepaliNumber("-0")).toBe(0)
+      expect(parseNepaliNumber("12345678901234567890")).toBe(12345678901234567000)
+    })
+
+    test("reads a 100 000-character hostile string in linear time", () => {
+      const started = performance.now()
+      expect(parseNepaliNumber("9".repeat(100000) + "x")).toBeNaN()
+      expect(parseNepaliNumber(",".repeat(100000))).toBeNaN()
+      expect(parseNepaliNumber("1,".repeat(50000))).toBeNaN()
+      expect(performance.now() - started).toBeLessThan(1000)
     })
 
     test("handles edge cases", () => {
@@ -162,6 +221,7 @@ describe("Conversion Functions", () => {
     })
 
     test("handles empty strings", () => {
+      expect(convert(null as unknown as string)).toBe("")
       expect(convert("")).toBe("")
       expect(convert("", false)).toBe("")
     })

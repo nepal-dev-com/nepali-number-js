@@ -1,5 +1,15 @@
 import { describe, expect, test } from "bun:test"
-import { toDecimalWord, toEnglishWords, toNepaliOrdinal, toNepaliWords } from "."
+import {
+  parseEnglishWords,
+  parseNepaliWords,
+  toDecimalWord,
+  toEnglishOrdinal,
+  toEnglishOrdinalNumber,
+  toEnglishWords,
+  toNepaliOrdinal,
+  toNepaliOrdinalNumber,
+  toNepaliWords,
+} from "."
 
 describe("Words Functions", () => {
   describe("toNepaliWords", () => {
@@ -184,6 +194,242 @@ describe("Words Functions", () => {
       expect(toDecimalWord(99)).toBe("९९")
       expect(toDecimalWord(100)).toBe("१ सय")
       expect(toDecimalWord(1000)).toBe("१ हजार")
+    })
+  })
+  describe("ADR-0014: decimals, exact big numbers and invalid input", () => {
+    test("reads a fraction digit by digit after दशमलव", () => {
+      expect(toNepaliWords(12.5)).toBe("बाह्र दशमलव पाँच")
+      expect(toNepaliWords(3.14)).toBe("तीन दशमलव एक चार")
+      expect(toNepaliWords(0.05)).toBe("शून्य दशमलव शून्य पाँच")
+      expect(toNepaliWords("12.50")).toBe("बाह्र दशमलव पाँच")
+      expect(toNepaliWords("12.0")).toBe("बाह्र")
+      expect(toNepaliWords(-0.5)).toBe("ऋण शून्य दशमलव पाँच")
+      expect(toNepaliWords("१२.५")).toBe("बाह्र दशमलव पाँच")
+    })
+
+    test("is exact above 2^53 and recurses above महाशंख", () => {
+      expect(toNepaliWords(10n ** 19n)).toBe("एक महाशंख")
+      expect(toNepaliWords(10n ** 21n)).toBe("एक सय महाशंख")
+      expect(toNepaliWords(10n ** 22n)).toBe("एक हजार महाशंख")
+      expect(toNepaliWords(12345678901234567890n)).toBe(
+        "एक महाशंख तेईस शंख पैंतालीस पद्म सतसट्ठी नील उनान्नब्बे खर्ब एक अर्ब तेईस करोड पैंतालीस लाख सतसट्ठी हजार आठ सय नब्बे",
+      )
+      expect(toNepaliWords("12345678901234567890")).toBe(toNepaliWords(12345678901234567890n))
+      expect(toNepaliWords("9007199254740993")).toEndWith("त्रियानब्बे")
+      expect(toNepaliWords(100001)).toBe("एक लाख एक")
+    })
+
+    test("returns an empty string for input that is not a number", () => {
+      for (const invalid of ["abc", "", "12abc", "1.2.3"]) {
+        expect(toNepaliWords(invalid)).toBe("")
+        expect(toEnglishWords(invalid)).toBe("")
+        expect(toNepaliOrdinal(invalid)).toBe("")
+        expect(toEnglishOrdinal(invalid)).toBe("")
+        expect(toNepaliOrdinalNumber(invalid)).toBe("")
+        expect(toEnglishOrdinalNumber(invalid)).toBe("")
+        expect(toDecimalWord(invalid)).toBe("")
+      }
+      expect(toNepaliWords(NaN)).toBe("")
+      expect(toNepaliWords(Infinity)).toBe("")
+      expect(toNepaliWords(null as unknown as string)).toBe("")
+    })
+
+    test("spells a 100 000-digit number without failing", () => {
+      const started = performance.now()
+      expect(toNepaliWords("9".repeat(2000)).length).toBeGreaterThan(2000)
+      const huge = "9".repeat(300000)
+      expect(toNepaliWords(huge).length).toBeGreaterThan(300000)
+      expect(toEnglishWords(huge).length).toBeGreaterThan(300000)
+      expect(toEnglishWords(huge, { system: "international" }).length).toBeGreaterThan(300000)
+      expect(toNepaliOrdinal(huge)).toEndWith("उनान्सयौं")
+      expect(toNepaliWords(10n ** 38n)).toBe("एक महाशंख महाशंख")
+      expect(toNepaliWords(10n ** 38n + 5n * 10n ** 19n + 7n)).toBe("एक महाशंख पाँच महाशंख सात")
+      expect(toNepaliWords("9".repeat(100000) + "x")).toBe("")
+      expect(performance.now() - started).toBeLessThan(2000)
+    })
+  })
+
+  describe("toEnglishWords options", () => {
+    test("reads decimals after point", () => {
+      expect(toEnglishWords(12.5)).toBe("twelve point five")
+      expect(toEnglishWords(-0.05)).toBe("negative zero point zero five")
+    })
+
+    test("uses the international system", () => {
+      expect(toEnglishWords(1234567, { system: "international" })).toBe(
+        "one million two hundred thirty four thousand five hundred sixty seven",
+      )
+      expect(toEnglishWords(1000000000, { system: "international" })).toBe("one billion")
+      expect(toEnglishWords(10n ** 33n, { system: "international" })).toBe("one decillion")
+      expect(toEnglishWords(10n ** 36n, { system: "international" })).toBe("one thousand decillion")
+      expect(toEnglishWords(100000, { system: "international" })).toBe("one hundred thousand")
+    })
+
+    test("hyphenates and adds and", () => {
+      expect(toEnglishWords(23, { hyphenate: true })).toBe("twenty-three")
+      expect(toEnglishWords(20, { hyphenate: true })).toBe("twenty")
+      expect(toEnglishWords(123, { and: true })).toBe("one hundred and twenty three")
+      expect(toEnglishWords(100, { and: true })).toBe("one hundred")
+      expect(toEnglishWords(1105, { and: true, hyphenate: true })).toBe("one thousand one hundred and five")
+      expect(toEnglishWords(1e21)).toBe("one hundred maha-shankh")
+    })
+  })
+
+  describe("toNepaliOrdinal (ADR-0014)", () => {
+    test("rejects non-integers and stays exact for bigint", () => {
+      expect(toNepaliOrdinal(12.5)).toBe("")
+      expect(toNepaliOrdinal("5.0")).toBe("पाँचौं")
+      expect(toNepaliOrdinal(-2)).toBe("ऋण दुइऔं")
+      expect(toNepaliOrdinal(10n ** 19n)).toBe("एक महाशंखौं")
+      expect(toNepaliOrdinal(12345678)).toBe("एक करोड तेईस लाख पैंतालीस हजार छ सय अठहत्तरौं")
+    })
+  })
+
+  describe("toEnglishOrdinal", () => {
+    test("makes the last word ordinal", () => {
+      const cases: [number | string, string][] = [
+        [1, "first"], [2, "second"], [3, "third"], [4, "fourth"], [5, "fifth"], [8, "eighth"], [9, "ninth"],
+        [12, "twelfth"], [20, "twentieth"], ["२१", "twenty first"], [100, "one hundredth"],
+        [101, "one hundred first"], [1234567, "twelve lakh thirty four thousand five hundred sixty seventh"],
+        [10000000, "one croreth"], [0, "zeroth"], [-1, "negative first"], [40, "fortieth"], [13, "thirteenth"],
+      ]
+      for (const [input, expected] of cases) {
+        expect(toEnglishOrdinal(input)).toBe(expected)
+      }
+    })
+
+    test("respects the word options and rejects non-integers", () => {
+      expect(toEnglishOrdinal(21, { hyphenate: true })).toBe("twenty-first")
+      expect(toEnglishOrdinal(1000000, { system: "international" })).toBe("one millionth")
+      expect(toEnglishOrdinal(12.5)).toBe("")
+    })
+  })
+
+  describe("toNepaliOrdinalNumber", () => {
+    test("adds the Nepali ordinal suffix to the digits", () => {
+      expect(toNepaliOrdinalNumber(1)).toBe("१लो")
+      expect(toNepaliOrdinalNumber(2)).toBe("२रो")
+      expect(toNepaliOrdinalNumber(3)).toBe("३रो")
+      expect(toNepaliOrdinalNumber(4)).toBe("४थो")
+      expect(toNepaliOrdinalNumber(5)).toBe("५औं")
+      expect(toNepaliOrdinalNumber("२१")).toBe("२१औं")
+      expect(toNepaliOrdinalNumber(11)).toBe("११औं")
+      expect(toNepaliOrdinalNumber(100)).toBe("१००औं")
+      expect(toNepaliOrdinalNumber(12345678)).toBe("१२३४५६७८औं")
+      expect(toNepaliOrdinalNumber(5, { useNepaliDigits: false })).toBe("5औं")
+      expect(toNepaliOrdinalNumber(0)).toBe("०औं")
+    })
+
+    test("rejects negatives and non-integers", () => {
+      expect(toNepaliOrdinalNumber(-5)).toBe("")
+      expect(toNepaliOrdinalNumber(12.5)).toBe("")
+    })
+  })
+
+  describe("toEnglishOrdinalNumber", () => {
+    test("adds st, nd, rd or th by the last two digits", () => {
+      const cases: [number | string, string][] = [
+        [1, "1st"], [2, "2nd"], [3, "3rd"], [4, "4th"], [11, "11th"], [12, "12th"], [13, "13th"], ["२१", "21st"],
+        [102, "102nd"], [112, "112th"], [12345678, "12345678th"], [0, "0th"], [23, "23rd"], [111, "111th"],
+      ]
+      for (const [input, expected] of cases) {
+        expect(toEnglishOrdinalNumber(input)).toBe(expected)
+      }
+      expect(toEnglishOrdinalNumber(21, { useNepaliDigits: true })).toBe("२१st")
+    })
+
+    test("rejects negatives and non-integers", () => {
+      expect(toEnglishOrdinalNumber(-5)).toBe("")
+      expect(toEnglishOrdinalNumber(12.5)).toBe("")
+    })
+  })
+
+  describe("toDecimalWord (ADR-0014)", () => {
+    test("abbreviates negatives and takes options", () => {
+      expect(toDecimalWord(-1200000)).toBe("-१२ लाख")
+      expect(toDecimalWord(-1250000)).toBe("-१२.५० लाख")
+      expect(toDecimalWord(1250000, { precision: 1 })).toBe("१२.५ लाख")
+      expect(toDecimalWord(1250000, { precision: 500 })).toBe("१२.५० लाख")
+      expect(toDecimalWord(1200000, { useNepaliDigits: false })).toBe("12 लाख")
+      expect(toDecimalWord(1250000, { useNepaliDigits: false })).toBe("12.50 लाख")
+      expect(toDecimalWord(50, { useNepaliDigits: false })).toBe("50")
+    })
+
+    test("keeps the documented positive outputs", () => {
+      const cases: [number | string, string][] = [
+        [1200000, "१२ लाख"], ["१२,००,०००", "१२ लाख"], [25000000, "२.५० करोड"], [12345678, "१.२३ करोड"],
+        [1000000000, "१ अर्ब"], [100000, "१ लाख"], [1234, "१.२३ हजार"], [150, "१.५० सय"], [99, "९९"],
+        [99.5, "९९.५०"], [0, "०"],
+      ]
+      for (const [input, expected] of cases) {
+        expect(toDecimalWord(input)).toBe(expected)
+      }
+      expect(toDecimalWord(10n ** 23n)).toBe("१०,००० महाशंख")
+    })
+  })
+
+  describe("parseNepaliWords", () => {
+    test("reads what toNepaliWords writes", () => {
+      expect(parseNepaliWords("एक सय तेईस")).toBe(123)
+      expect(parseNepaliWords("एक लाख पच्चीस हजार")).toBe(125000)
+      expect(parseNepaliWords("एक करोड तेईस लाख पैंतालीस हजार छ सय अठहत्तर")).toBe(12345678)
+      expect(parseNepaliWords("शून्य")).toBe(0)
+      expect(parseNepaliWords("ऋण पैंतालीस")).toBe(-45)
+      expect(parseNepaliWords("बाह्र दशमलव पाँच")).toBe(12.5)
+      expect(parseNepaliWords("शून्य दशमलव शून्य पाँच")).toBe(0.05)
+      expect(parseNepaliWords("  एक   सय  ")).toBe(100)
+      expect(parseNepaliWords("एक सय महाशंख")).toBe(1e21)
+      expect(parseNepaliWords("एक हजार महाशंख")).toBe(1e22)
+    })
+
+    test("round-trips with toNepaliWords", () => {
+      for (const value of [0, 7, 99, 100, 101, 999, 1000, 12345, 100000, 9999999, 123456789012, -3050, 4.25]) {
+        expect(parseNepaliWords(toNepaliWords(value))).toBe(value)
+      }
+    })
+
+    test("returns NaN for anything else", () => {
+      for (const invalid of [
+        "abc", "", "   ", "एक एक", "सय", "एक सय सय", "हजार एक", "एक हजार एक लाख", "एक हजार दुई हजार",
+        "शून्य एक", "एक शून्य", "एक दशमलव", "एक दशमलव बाह्र", "दशमलव पाँच", "ऋण", "एक सय तेईस abc", "एक सय दुई सय",
+      ]) {
+        expect(parseNepaliWords(invalid)).toBeNaN()
+      }
+      expect(parseNepaliWords(null as unknown as string)).toBeNaN()
+    })
+  })
+
+  describe("parseEnglishWords", () => {
+    test("reads both scale systems, hyphens, and, and any case", () => {
+      expect(parseEnglishWords("one hundred twenty three")).toBe(123)
+      expect(parseEnglishWords("one lakh twenty five thousand")).toBe(125000)
+      expect(parseEnglishWords("One Crore")).toBe(10000000)
+      expect(parseEnglishWords("one million")).toBe(1000000)
+      expect(parseEnglishWords("twenty-three")).toBe(23)
+      expect(parseEnglishWords("one hundred and five")).toBe(105)
+      expect(parseEnglishWords("zero")).toBe(0)
+      expect(parseEnglishWords("negative five")).toBe(-5)
+      expect(parseEnglishWords("twelve point five")).toBe(12.5)
+      expect(parseEnglishWords("one hundred maha-shankh")).toBe(1e21)
+      expect(parseEnglishWords("two billion three hundred million")).toBe(2300000000)
+      expect(parseEnglishWords("nineteen")).toBe(19)
+    })
+
+    test("round-trips with toEnglishWords in both systems", () => {
+      for (const value of [0, 7, 19, 20, 99, 100, 101, 12345, 100000, 9999999, 123456789012, -3050, 4.25]) {
+        expect(parseEnglishWords(toEnglishWords(value))).toBe(value)
+        expect(parseEnglishWords(toEnglishWords(value, { system: "international", hyphenate: true, and: true }))).toBe(value)
+      }
+    })
+
+    test("returns NaN for anything else", () => {
+      for (const invalid of [
+        "abc", "", "one one", "twenty twenty", "twenty eleven", "eleven one", "hundred", "one hundred hundred",
+        "thousand one", "one thousand one lakh", "one point", "one point twelve", "negative", "zero one", "first",
+      ]) {
+        expect(parseEnglishWords(invalid)).toBeNaN()
+      }
+      expect(parseEnglishWords(null as unknown as string)).toBeNaN()
     })
   })
 })

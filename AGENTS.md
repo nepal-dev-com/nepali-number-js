@@ -19,14 +19,18 @@ the rest of that section.
 read from its path in §11.
 
 > **Status.** The working agreement is set out in ADR-0001 to ADR-0011, all **Approved** by the
-> owner on 2026-11-14. Where two of them disagree, the newer one holds.
+> owner on 2026-11-14, and ADR-0019, approved on 2026-11-15. Where two of them disagree, the
+> newer one holds.
 
 ## 1. What this project is
 
 **`nepali-number`** is a zero-dependency TypeScript library, published to npm, for working with
 numbers in Nepali (Devanagari) script: converting digits between `0-9` and `०-९`, formatting
-with lakh/crore grouping, writing numbers as Nepali or English words and ordinals, and
-formatting Nepali Rupee amounts. It ships ESM, CommonJS, UMD and IIFE builds with type
+with lakh/crore grouping, writing numbers as Nepali or English words and ordinals and reading
+them back, formatting and parsing Nepali Rupee amounts, spoken fractions and multipliers,
+traditional land and weight units, and finding, comparing and sorting numbers inside text.
+Every number is read once into exact decimal digits, so `bigint` and long digit strings stay
+exact (ADR-0012). It ships ESM, CommonJS, UMD and IIFE builds with type
 declarations, so the same code runs in Node.js, Bun, Deno, bundlers and a plain `<script>` tag.
 
 - The overview, installation and examples for consumers are in [`README.md`](README.md).
@@ -173,6 +177,7 @@ depend on the answer, then ask.
 | Clean `dist/` and `coverage/` | `bun run clean` |
 | Clean reinstall | `bun run clean:fresh` |
 | Add a dependency | `bun add -d <pkg>` — **requires an approved ADR first**; runtime deps are not allowed (§6) |
+| Upgrade a dependency or an action | Dependabot proposes it weekly. Minor and patch need no ADR; a major version, and any `tsdown` 0.x minor, does (ADR-0019) |
 
 Run `bun run type-check`, `bun run test` and `bun run build` before declaring work complete.
 
@@ -202,9 +207,10 @@ These hold for every change. Departing from one needs an ADR that says so
 3. **Pure and stateless.** Every export is a pure function of its arguments. No module-level
    mutable state, no side effects on import, no classes in the public API.
 4. **No throwing for declared input types.** For any value of its declared parameter types a
-   function returns a value; invalid content yields a documented safe default (`""`, `0`,
-   `"०"`, `NaN`, `false`). The default is part of the contract and is documented in
-   `user-guide/dev/api/`.
+   function returns a value; invalid content yields the safe default of its return type:
+   `NaN` for a number, `""` for a string, `false` for a boolean, `[]` for an array (ADR-0012).
+   `null` and `undefined` passed from JavaScript get the same default. The default is part of
+   the contract and is documented in `user-guide/dev/api/`.
 5. **Output strings are the contract.** Consumers render and compare them. Any change to what
    an export returns for an existing input is a semver decision (ADR-0008).
 6. **Language data has one home.** Digits, words, ordinals and scales live in
@@ -307,13 +313,16 @@ full audit that runs before each release. Read it before a change touches any of
 .
 ├── AGENTS.md, CLAUDE.md   # this working agreement; CLAUDE.md imports it
 ├── README.md, LICENSE     # consumer-facing overview (npm shows it); MIT
+├── CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, SUPPORT.md, CITATION.cff
+│                          # for people on GitHub; they add no rule (ADR-0019)
 ├── docs/
 │   ├── agent-skills/      # this repository's own skills, nepali-number-* (ADR-0011)
 │   ├── _templates/        # a starting point for each document type
 │   └── docs.nepal-dev.com/  # git submodule: the documentation site (§8)
 ├── .claude/skills/, .agents/skills/   # links into docs/agent-skills/
 ├── src/                   # nepali-number.ts (the only build entry), constants.ts, one folder per domain
-├── .github/workflows/     # ci.yml, release.yml
+├── .github/               # issue forms, PR template, CODEOWNERS, FUNDING.yml, dependabot.yml;
+│                          # workflows/: ci.yml, release.yml, codeql.yml (ADR-0019)
 ├── package.json, tsconfig.json, tsdown.config.ts, bunfig.toml
 ├── dist/, coverage/       # generated, git-ignored, never edited
 └── sample/                # reference material from another project — not part of the package

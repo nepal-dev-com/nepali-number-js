@@ -17,7 +17,8 @@ Part of this repository's working agreement (ADR-0011): as binding as `AGENTS.md
 
 | If the change… | Check |
 |---|---|
-| Adds or upgrades a dependency (dev included) | ADR approved · well-maintained, widely used · lockfile diff reviewed · no install scripts, or they are understood |
+| Adds a dependency (dev included), upgrades one to a new major version, or takes a `tsdown` 0.x minor | ADR approved · well-maintained, widely used · lockfile diff reviewed · no install scripts, or they are understood |
+| Takes a minor or patch upgrade of a dependency or action already in use | No ADR needed (ADR-0019) · lockfile diff reviewed · no new install scripts · the owner merges by hand |
 | Adds or changes a regular expression | No nested or overlapping quantifiers on unbounded input (ReDoS) · tested with a long hostile string (e.g. 100 000 characters) |
 | Adds input parsing | Behaviour on empty, whitespace, huge, `NaN`, `Infinity`, and non-digit input is defined, tested and documented |
 | Touches `package.json` `files`, `exports` or scripts | `npm pack --dry-run` lists only `dist/`, `package.json`, `README.md`, `LICENSE` · no `prepare`/`postinstall` scripts that run on consumers' machines |

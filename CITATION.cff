@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: If you use this software, please cite it using these metadata.
+title: nepali-number
+type: software
+abstract: >-
+  A zero-dependency TypeScript library for numbers in Nepali (Devanagari) script: digits,
+  lakh and crore grouping, words, ordinals, Nepali Rupee amounts, fractions and traditional units.
+authors:
+  - name: nepal-dev.com
+    website: https://nepal-dev.com
+license: MIT
+repository-code: https://github.com/nepal-dev-com/nepali-number-js
+url: https://docs.nepal-dev.com/nepali-number
+keywords:
+  - nepali
+  - devanagari
+  - numbers
+  - localization

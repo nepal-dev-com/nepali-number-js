@@ -10,19 +10,20 @@ Part of this repository's working agreement (ADR-0011): as binding as `AGENTS.md
 ## First
 
 - Read the installed tool, not recall: check `node_modules/tsdown/`, `node_modules/typescript/` and the emitted `dist/` before asserting how a tool behaves.
-- No runtime dependency may be added. A dev dependency, or any change to build, test, CI or release tooling, needs an approved ADR.
+- No runtime dependency may be added. A new dev dependency, a major upgrade, a `tsdown` 0.x minor, or any change to build, test, CI or release tooling, needs an approved ADR.
 - Never edit `dist/` or `coverage/`, and never edit `sample/`.
 
 ## Current state (`AGENTS.md` §1)
 
 **Current state:** `package.json` is at `2.0.0`, but npm's `latest` is still **1.0.3** — no
 2.x has been published, and the release workflow cannot publish yet
-([`maintainer-guide/release/releasing.mdx`](../../../docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/release/releasing.mdx#current-gaps)). 21 functions are exported across five domains
-(conversion, formatting, words, currency, utils). The option and result types
-(`FormatOptions`, `CurrencyOptions`, `NumberSystem`) exist in `src/*/types.ts` but are **not**
-re-exported, so consumers cannot import them yet. 162 tests pass, 13 of them the check on this working agreement in `src/agent-docs.test.ts`; `bun run type-check` and
-`bun run build` are clean. Every function and line is covered except three unreachable
-fallbacks in `src/words/words.ts`.
+([`maintainer-guide/release/releasing.mdx`](../../../docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/release/releasing.mdx#current-gaps)). 45 functions are exported across eight domains
+(conversion, formatting, words, currency, fractions, units, text, utils), with their input, option
+and result types (`NumericInput`, `FormatOptions`, `CurrencyOptions`, `NumberSystem` and the rest
+of `src/*/types.ts`). Every export that reads a number goes through one exact decimal reader,
+`parseDecimal` in `src/conversion/decimal.ts` (ADR-0012). 298 tests pass, 13 of them the check on this working agreement in `src/agent-docs.test.ts` and 11 the check on the files for GitHub in `src/community-files.test.ts`; `bun run type-check`
+and `bun run build` are clean. Every function and line is covered. The minified ESM build is
+about 22.1 kB (7.5 kB gzipped).
 
 ## What is installed today (`AGENTS.md` §5)
 
@@ -39,6 +40,8 @@ What is installed **today** (verified from `package.json`, the lockfile and the 
 | Package manager | Bun (1.4.4 locally; CI uses `latest`); `bun.lock` is committed |
 | CI | `.github/workflows/ci.yml`: type-check, test, build on Node 20 / 22 / 24; Codecov upload; pack-and-require smoke test |
 | Release | `.github/workflows/release.yml`: runs `bun run release` after CI passes on `main`, `beta`, `alpha` — see [`maintainer-guide/release/releasing.mdx`](../../../docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/release/releasing.mdx) for its current gaps |
+| Code scanning | `.github/workflows/codeql.yml`: CodeQL on the TypeScript and the workflows, on pull requests and pushes to `main` and weekly; actions pinned to commit SHAs (ADR-0019) |
+| Dependency updates | `.github/dependabot.yml`: weekly, grouped, 7-day cooldown, for the dev dependencies and the actions. Minor and patch are approved as a class; a major version, and any `tsdown` 0.x minor, needs its own ADR (ADR-0019) |
 | Linting / formatting | **None installed.** Adopting one is a tooling ADR |
 
 ## Repository map (`AGENTS.md` §10)
@@ -49,6 +52,11 @@ What is installed **today** (verified from `package.json`, the lockfile and the 
 ├── CLAUDE.md              # → @AGENTS.md
 ├── README.md              # consumer-facing overview — npm shows this page
 ├── LICENSE                # MIT
+├── CONTRIBUTING.md        # how to contribute, for people; AGENTS.md stays the authority (ADR-0019)
+├── CODE_OF_CONDUCT.md     # Contributor Covenant 2.1
+├── SECURITY.md            # how to report a vulnerability: GitHub private report, then email
+├── SUPPORT.md             # where a question, a bug or an idea goes
+├── CITATION.cff           # GitHub's "Cite this repository"; no version field, so nothing to bump
 ├── docs/
 │   ├── agent-skills/      # this repository's own skills, nepali-number-<topic>/SKILL.md (ADR-0011)
 │   ├── _templates/        # a starting point for each document type
@@ -66,13 +74,23 @@ What is installed **today** (verified from `package.json`, the lockfile and the 
 │   ├── nepali-number.ts   # public barrel — the only build entry
 │   ├── constants.ts       # digits, words, ordinals, scales — all language data
 │   ├── agent-docs.test.ts # checks AGENTS.md, the skills and their links (ADR-0011)
-│   ├── conversion/        # toNepali, toEnglish, parseNepaliNumber, convert
-│   ├── formatting/        # formatNepaliNumber, addNepaliCommas, removeFormatting; FormatOptions
-│   ├── words/             # toNepaliWords, toEnglishWords, toNepaliOrdinal, toDecimalWord
-│   ├── currency/          # toNepaliCurrency, toNepaliCurrencyWords; CurrencyOptions
+│   ├── community-files.test.ts # checks the files for GitHub exist, parse and link (ADR-0019)
+│   ├── conversion/        # toNepali, toEnglish, parseNepaliNumber, convert; NumericInput
+│   │   └── decimal.ts     # internal: the exact decimal reader, rounding, grouping, comparing (ADR-0012)
+│   ├── formatting/        # formatNepaliNumber, addNepaliCommas, formatPercent, removeFormatting
+│   │   └── internal.ts    # internal: formatDecimal, shared by words and currency
+│   ├── words/             # cardinals, ordinals, digit ordinals, toDecimalWord, parseNepaliWords, parseEnglishWords
+│   ├── currency/          # toNepaliCurrency, currency words in Nepali and English, parseNepaliCurrency
+│   ├── fractions/         # toNepaliFraction, toNepaliFractionWords, toNepaliMultiplier (ADR-0016)
+│   ├── units/             # land (ropani, bigha) and weight (tola) conversion and formatting (ADR-0017)
+│   ├── text/              # numbers inside prose; compareNumbers, sortNumbers (ADR-0018)
 │   └── utils/             # normalize, detection, validation, padZeros, roundNepali; NumberSystem
 ├── .gitmodules            # the documentation submodule
-├── .github/workflows/     # ci.yml, release.yml
+├── .github/
+│   ├── ISSUE_TEMPLATE/    # bug, language, proposal, docs forms; config.yml turns blank issues off
+│   ├── PULL_REQUEST_TEMPLATE.md, CODEOWNERS, FUNDING.yml
+│   ├── dependabot.yml     # weekly grouped updates, 7 days old at the least (ADR-0019)
+│   └── workflows/         # ci.yml, release.yml, codeql.yml
 ├── package.json           # exports map, scripts, files: ["dist"]
 ├── tsconfig.json          # strict; isolatedDeclarations; @/* → src/*; includes src only
 ├── tsdown.config.ts       # ESM + CJS + IIFE + UMD, global nepaliNumber
@@ -82,4 +100,5 @@ What is installed **today** (verified from `package.json`, the lockfile and the 
 ```
 
 Each domain folder holds `<domain>.ts`, `<domain>.test.ts`, `index.ts`, and `types.ts` when the
-domain exports a type.
+domain exports a type. `decimal.ts` and `internal.ts` are imported by other domains by path
+(`@/conversion/decimal`, `@/formatting/internal`) and are **not** re-exported from the barrel.
