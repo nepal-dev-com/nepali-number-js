@@ -27,8 +27,12 @@ Part of this repository's working agreement (ADR-0011): as binding as `AGENTS.md
   does.
 - **Dependencies between domains point one way**, as drawn in
   [`maintainer-guide/architecture/system.mdx`](../../../docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/architecture/system.mdx): `constants` ← `conversion` ←
-  `formatting` ← `utils` ← `words` ← `currency`. A new import that points back up, or creates a
-  cycle, needs an ADR.
+  `formatting` ← `utils` ← `words` ← `currency`, with `fractions`, `units` and `text` as leaves
+  that nothing imports. A new import that points back up, or creates a cycle, needs an ADR.
+- **Read a number once, with `parseDecimal`** from `@/conversion/decimal` (ADR-0012), and work on
+  its digit strings. Never `parseFloat`, `Number(input)`, `toFixed` or `Math.round` on input: they
+  bring back float rounding and the 2^53 ceiling. Invalid input returns the safe default of the
+  return type: `NaN`, `""`, `false` or `[]`.
 
 ## Adding a new export (after the ADR is approved)
 
@@ -39,9 +43,10 @@ Part of this repository's working agreement (ADR-0011): as binding as `AGENTS.md
 3. **Options** get an interface in `src/<domain>/types.ts`; every field optional, defaults
    applied by destructuring in the function signature.
 4. **Re-export.** Domain `index.ts` files use `export * from "./<domain>"`; a new domain also adds
-   `export * from "@/<domain>"` to `src/nepali-number.ts`. A public type must also be
-   re-exported (`export type * from "./types"`) — today's `index.ts` files do not do this, which
-   is why the existing option types are unreachable for consumers.
+   `export * from "@/<domain>"` to `src/nepali-number.ts`. A public type is re-exported with
+   `export type * from "./types"` in the same `index.ts`. A helper other domains need but
+   consumers must not see goes in a file the `index.ts` does not re-export, as
+   `conversion/decimal.ts` and `formatting/internal.ts` do.
 5. **Test** in `src/<domain>/<domain>.test.ts`, importing from `"."` (§ ADR-0007 for coverage).
 6. **Document** in `user-guide/dev/api/<domain>.mdx` and the README's API summary.
 7. **Verify**: `bun run type-check`, `bun run test`, `bun run build`, then load the built CJS
@@ -75,8 +80,7 @@ const cleaned = input.replace(/,/g, "")
   adopts a linter turns on `curly: ["error", "all"]`.
 - **Every export carries TSDoc** — a one-line summary, `@param` for each parameter, `@returns`
   including the safe default for invalid input, and an `@example`. It is emitted into
-  `dist/nepali-number.d.ts` and is what consumers read in their editor. Several exports in
-  `currency`, `words` and `utils` lack it today; add it when you touch them.
+  `dist/nepali-number.d.ts` and is what consumers read in their editor.
 - **Configuration files may describe what a key does** (`tsconfig.json`, `tsdown.config.ts`,
   `bunfig.toml`, CI workflows), still briefly, still linking the ADR that governs the value.
 - **Existing code is not rewritten to match** unless the change already touches it.

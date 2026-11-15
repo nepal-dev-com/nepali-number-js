@@ -1,83 +1,144 @@
-import { toEnglish, toNepali } from "@/conversion"
-import type { FormatOptions } from "./types.ts"
+import type { NumericInput } from "@/conversion"
+import { digitValue, type Grouping, groupDigits, parseDecimal, shiftDecimal, toEnglishDigits } from "@/conversion/decimal"
+import { formatDecimal } from "./internal"
+import type { FormatOptions, PercentOptions } from "./types"
+
+const MINUS = 45
+const POINT = 46
 
 /**
- * Format number with Nepali digits and locale-specific formatting
+ * Format a number for display: round, group with commas and convert to Nepali digits.
  *
- * @param number {number | string} - The number to format
- * @param options {FormatOptions} - Formating Options
+ * @param number - A number, a bigint, or a string in English, Nepali or mixed digits
+ * @param options - Digits, grouping, precision and sign
  *
- * @returns {string} - The formatted number
+ * @returns The formatted string, exact at any size; `""` when the input is not a number
+ *
+ * @example
+ * formatNepaliNumber(1234567) // "१२,३४,५६७"
  */
-export const formatNepaliNumber = (number: number | string, options: FormatOptions = {}): string => {
-  const {
-    useNepaliDigits = true,
-    addCommas = true,
-    precision = 2,
-    trimZero = true,
-  } = options
+export const formatNepaliNumber = (number: NumericInput, options: FormatOptions = {}): string => {
+  const parsed = parseDecimal(number)
 
-  const num = typeof number === "string" ? parseFloat(toEnglish(number)) : number
+  return parsed === null ? "" : formatDecimal(parsed, options)
+}
 
-  if (isNaN(num) || num === 0) {
-    let zeroFormatted = trimZero ? 0 : (0).toFixed(precision)
+const isZeroDigit = (code: number): boolean => digitValue(code) === 0
 
-    return (useNepaliDigits ? toNepali(zeroFormatted) : zeroFormatted).toString()
+const groupWritten = (text: string, negative: boolean, grouping: Grouping): string => {
+  let integer = ""
+  let fraction = ""
+  let seenPoint = false
+
+  for (let index = 0; index < text.length; index++) {
+    const code = text.charCodeAt(index)
+
+    if (code === POINT) {
+      seenPoint = true
+    } else if (digitValue(code) >= 0) {
+      if (seenPoint) {
+        fraction += text[index]
+      } else {
+        integer += text[index]
+      }
+    }
   }
 
-  let formatted = num.toFixed(precision)
-
-  // remove trailing zeros if there are any decimals for cleaner display
-  if (formatted.includes(".") && trimZero) {
-    formatted = formatted.replace(/\.0+$/, "") // remove .00, .000, etc.
+  let start = 0
+  while (start < integer.length - 1 && isZeroDigit(integer.charCodeAt(start))) {
+    start++
   }
 
-  if (addCommas) {
-    formatted = addNepaliCommas(formatted)
-  }
+  const grouped = groupDigits(integer === "" ? "0" : integer.slice(start), grouping)
+  const sign = negative ? "-" : ""
 
-  return useNepaliDigits ? toNepali(formatted) : formatted
+  return fraction === "" ? sign + grouped : `${sign}${grouped}.${fraction}`
 }
 
 /**
- * Add commas in Nepali (Indian) number format (lakh/crore system)
+ * Insert grouping commas without rounding, keeping each digit in the script it was written in.
  *
- * @param number {string | number} - The number to format
+ * @param number - A number, a bigint, or a string in English, Nepali or mixed digits
+ * @param grouping - `"nepali"` (last three, then pairs) or `"international"` (threes)
  *
- * @returns {string} - The formatted number
+ * @returns The grouped string; `""` when the input is not a number
+ *
+ * @example
+ * addNepaliCommas(1234567) // "12,34,567"
  */
-export const addNepaliCommas = (number: string | number): string => {
-  const parts = number.toString().split(".")
-  let integerPart = parts[0] ?? ""
-  const decimalPart = parts[1]
+export const addNepaliCommas = (number: NumericInput, grouping: Grouping = "nepali"): string => {
+  const parsed = parseDecimal(number)
 
-  const minusSign = integerPart.indexOf("-") > -1
-  if (minusSign) {
-    integerPart = integerPart.slice(1)
+  if (parsed === null) {
+    return ""
   }
 
-  // apply indian numbering system (lakh/crore)
-  if (integerPart.length > 3) {
-    const lastThree = integerPart.slice(-3)
-    const remaining = integerPart.slice(0, -3)
-
-    integerPart = remaining.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + "," + lastThree
+  if (typeof number === "string") {
+    // The parsed digits are ASCII; the written ones keep their script.
+    return groupWritten(number, parsed.negative, grouping)
   }
 
-  if (minusSign) {
-    integerPart = "-" + integerPart
-  }
+  const integer = groupDigits(parsed.integer, grouping)
+  const sign = parsed.negative ? "-" : ""
 
-  return decimalPart ? `${integerPart}.${decimalPart}` : integerPart
+  return parsed.fraction === "" ? sign + integer : `${sign}${integer}.${parsed.fraction}`
 }
 
 /**
- * Remove formatting and non-digits to get raw number
+ * Format a percentage.
  *
- * @param formattedString {string | number}
+ * @param value - The percentage, or a ratio when `isRatio` is set
+ * @param options - Digits, precision, grouping, ratio and symbol
  *
- * @returns {number} - The raw number
+ * @returns The formatted number followed by the symbol; `""` when the input is not a number
+ *
+ * @example
+ * formatPercent(12.5) // "१२.५०%"
+ */
+export const formatPercent = (value: NumericInput, options: PercentOptions = {}): string => {
+  const { isRatio = false, symbol = "%", ...format } = options
+  const parsed = parseDecimal(value)
+
+  if (parsed === null) {
+    return ""
+  }
+
+  return formatDecimal(isRatio ? shiftDecimal(parsed, 2) : parsed, format) + symbol
+}
+
+/**
+ * Pull the number out of formatted text, dropping everything but digits, the sign and the dot.
+ *
+ * @param formattedString - Any formatted amount
+ *
+ * @returns The number; `NaN` when the text holds no number
+ *
+ * @example
+ * removeFormatting("रू १२,३४,५६७.८९") // 1234567.89
  */
 export const removeFormatting = (formattedString: string | number): number => {
-  return Number(toEnglish(formattedString).replace(/[,\s]/g, "").replace(/[^\d.-]/g, ""))
+  if (typeof formattedString === "number") {
+    return formattedString
+  }
+
+  if (typeof formattedString !== "string") {
+    return NaN
+  }
+
+  const text = toEnglishDigits(formattedString)
+  let kept = ""
+  let hasDigit = false
+
+  for (let index = 0; index < text.length; index++) {
+    const code = text.charCodeAt(index)
+
+    if (digitValue(code) >= 0) {
+      hasDigit = true
+      kept += text[index]
+    } else if (code === MINUS || code === POINT) {
+      kept += text[index]
+    }
+  }
+
+  return hasDigit ? Number(kept) : NaN
 }

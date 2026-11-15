@@ -25,8 +25,11 @@ read from its path in §11.
 
 **`nepali-number`** is a zero-dependency TypeScript library, published to npm, for working with
 numbers in Nepali (Devanagari) script: converting digits between `0-9` and `०-९`, formatting
-with lakh/crore grouping, writing numbers as Nepali or English words and ordinals, and
-formatting Nepali Rupee amounts. It ships ESM, CommonJS, UMD and IIFE builds with type
+with lakh/crore grouping, writing numbers as Nepali or English words and ordinals and reading
+them back, formatting and parsing Nepali Rupee amounts, spoken fractions and multipliers,
+traditional land and weight units, and finding, comparing and sorting numbers inside text.
+Every number is read once into exact decimal digits, so `bigint` and long digit strings stay
+exact (ADR-0012). It ships ESM, CommonJS, UMD and IIFE builds with type
 declarations, so the same code runs in Node.js, Bun, Deno, bundlers and a plain `<script>` tag.
 
 - The overview, installation and examples for consumers are in [`README.md`](README.md).
@@ -202,9 +205,10 @@ These hold for every change. Departing from one needs an ADR that says so
 3. **Pure and stateless.** Every export is a pure function of its arguments. No module-level
    mutable state, no side effects on import, no classes in the public API.
 4. **No throwing for declared input types.** For any value of its declared parameter types a
-   function returns a value; invalid content yields a documented safe default (`""`, `0`,
-   `"०"`, `NaN`, `false`). The default is part of the contract and is documented in
-   `user-guide/dev/api/`.
+   function returns a value; invalid content yields the safe default of its return type:
+   `NaN` for a number, `""` for a string, `false` for a boolean, `[]` for an array (ADR-0012).
+   `null` and `undefined` passed from JavaScript get the same default. The default is part of
+   the contract and is documented in `user-guide/dev/api/`.
 5. **Output strings are the contract.** Consumers render and compare them. Any change to what
    an export returns for an existing input is a semver decision (ADR-0008).
 6. **Language data has one home.** Digits, words, ordinals and scales live in

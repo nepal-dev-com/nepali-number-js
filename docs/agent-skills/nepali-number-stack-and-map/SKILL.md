@@ -17,12 +17,13 @@ Part of this repository's working agreement (ADR-0011): as binding as `AGENTS.md
 
 **Current state:** `package.json` is at `2.0.0`, but npm's `latest` is still **1.0.3** — no
 2.x has been published, and the release workflow cannot publish yet
-([`maintainer-guide/release/releasing.mdx`](../../../docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/release/releasing.mdx#current-gaps)). 21 functions are exported across five domains
-(conversion, formatting, words, currency, utils). The option and result types
-(`FormatOptions`, `CurrencyOptions`, `NumberSystem`) exist in `src/*/types.ts` but are **not**
-re-exported, so consumers cannot import them yet. 162 tests pass, 13 of them the check on this working agreement in `src/agent-docs.test.ts`; `bun run type-check` and
-`bun run build` are clean. Every function and line is covered except three unreachable
-fallbacks in `src/words/words.ts`.
+([`maintainer-guide/release/releasing.mdx`](../../../docs/docs.nepal-dev.com/content/nepali-number/maintainer-guide/release/releasing.mdx#current-gaps)). 45 functions are exported across eight domains
+(conversion, formatting, words, currency, fractions, units, text, utils), with their input, option
+and result types (`NumericInput`, `FormatOptions`, `CurrencyOptions`, `NumberSystem` and the rest
+of `src/*/types.ts`). Every export that reads a number goes through one exact decimal reader,
+`parseDecimal` in `src/conversion/decimal.ts` (ADR-0012). 287 tests pass, 13 of them the check on this working agreement in `src/agent-docs.test.ts`; `bun run type-check`
+and `bun run build` are clean. Every function and line is covered. The minified ESM build is
+about 22.1 kB (7.5 kB gzipped).
 
 ## What is installed today (`AGENTS.md` §5)
 
@@ -66,10 +67,15 @@ What is installed **today** (verified from `package.json`, the lockfile and the 
 │   ├── nepali-number.ts   # public barrel — the only build entry
 │   ├── constants.ts       # digits, words, ordinals, scales — all language data
 │   ├── agent-docs.test.ts # checks AGENTS.md, the skills and their links (ADR-0011)
-│   ├── conversion/        # toNepali, toEnglish, parseNepaliNumber, convert
-│   ├── formatting/        # formatNepaliNumber, addNepaliCommas, removeFormatting; FormatOptions
-│   ├── words/             # toNepaliWords, toEnglishWords, toNepaliOrdinal, toDecimalWord
-│   ├── currency/          # toNepaliCurrency, toNepaliCurrencyWords; CurrencyOptions
+│   ├── conversion/        # toNepali, toEnglish, parseNepaliNumber, convert; NumericInput
+│   │   └── decimal.ts     # internal: the exact decimal reader, rounding, grouping, comparing (ADR-0012)
+│   ├── formatting/        # formatNepaliNumber, addNepaliCommas, formatPercent, removeFormatting
+│   │   └── internal.ts    # internal: formatDecimal, shared by words and currency
+│   ├── words/             # cardinals, ordinals, digit ordinals, toDecimalWord, parseNepaliWords, parseEnglishWords
+│   ├── currency/          # toNepaliCurrency, currency words in Nepali and English, parseNepaliCurrency
+│   ├── fractions/         # toNepaliFraction, toNepaliFractionWords, toNepaliMultiplier (ADR-0016)
+│   ├── units/             # land (ropani, bigha) and weight (tola) conversion and formatting (ADR-0017)
+│   ├── text/              # numbers inside prose; compareNumbers, sortNumbers (ADR-0018)
 │   └── utils/             # normalize, detection, validation, padZeros, roundNepali; NumberSystem
 ├── .gitmodules            # the documentation submodule
 ├── .github/workflows/     # ci.yml, release.yml
@@ -82,4 +88,5 @@ What is installed **today** (verified from `package.json`, the lockfile and the 
 ```
 
 Each domain folder holds `<domain>.ts`, `<domain>.test.ts`, `index.ts`, and `types.ts` when the
-domain exports a type.
+domain exports a type. `decimal.ts` and `internal.ts` are imported by other domains by path
+(`@/conversion/decimal`, `@/formatting/internal`) and are **not** re-exported from the barrel.
