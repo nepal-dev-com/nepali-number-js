@@ -1,0 +1,23 @@
+name: Documentation problem
+description: A page or the README is wrong, out of date, unclear or missing.
+labels: [documentation]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      description: The address of the page, or where a page is missing.
+      placeholder: https://docs.nepal-dev.com/nepali-number/…
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong
+      description: Quote the text if you can, and say what the package actually returns.
+    validations:
+      required: true
+  - type: textarea
+    id: fix
+    attributes:
+      label: What it should say

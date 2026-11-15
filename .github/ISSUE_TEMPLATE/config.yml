@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security problem
+    url: https://github.com/nepal-dev-com/nepali-number-js/security/policy
+    about: Never in a public issue. The security policy says how to report it privately.
+  - name: Ask a question
+    url: https://github.com/nepal-dev-com/nepali-number-js/discussions
+    about: How to use the package, or whether something is a bug.
+  - name: Read the docs
+    url: https://docs.nepal-dev.com/nepali-number
+    about: Every function, with its options, defaults, outputs and limitations.

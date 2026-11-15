@@ -1,5 +1,8 @@
 [test]
 
+# only this package's tests; the documentation submodule in docs/ has its own — ADR-0010
+root = "src"
+
 # always enable coverage
 coverage = true
 coverageReporter = ["text", "lcov"]

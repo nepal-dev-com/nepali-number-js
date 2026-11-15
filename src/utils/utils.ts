@@ -1,103 +1,191 @@
-import { NEPALI_DIGITS } from "@/constants"
-import { toNepali } from "@/conversion"
-import { removeFormatting } from "@/formatting"
-import type { NumberSystem } from "@/utils/types"
+import type { NumericInput } from "@/conversion"
+import {
+  decimalToString,
+  digitValue,
+  isNepaliDigitCode,
+  parseDecimal,
+  readPlaces,
+  roundDecimal,
+  scanDecimal,
+  toNepaliDigits,
+} from "@/conversion/decimal"
+import type { NumberSystem, PadOptions } from "./types"
+
+const MAX_PAD_LENGTH = 1000
 
 /**
- * Pad with Nepali zeros
+ * Left-pad a number with zeros; a minus sign stays in front and counts toward the length.
  *
- * @param number {number | string} - The number to pad
- * @param length {number} - Length for zero pad
+ * @param number - A number, a bigint, or a string in English, Nepali or mixed digits
+ * @param length - Target length, at most 1000; a value that is not a finite integer adds no padding
+ * @param options - `useNepaliDigits: false` keeps English digits
  *
- * @returns {string} - The padded number
+ * @returns The padded string; `""` when the input is not a number
+ *
+ * @example
+ * padZeros(42, 5) // "०००४२"
  */
-export const padZeros = (number: number | string, length: number): string => {
-  const str = number.toString()
-  const zeros = (NEPALI_DIGITS[0] ?? "0").repeat(Math.max(0, length - str.length))
+export const padZeros = (number: NumericInput, length: number, options: PadOptions = {}): string => {
+  const { useNepaliDigits = true } = options
+  const parsed = parseDecimal(number)
 
-  return zeros + toNepali(str)
+  if (parsed === null) {
+    return ""
+  }
+
+  const sign = parsed.negative ? "-" : ""
+  const body = decimalToString({ ...parsed, negative: false })
+  const width = Number.isInteger(length) ? Math.min(length, MAX_PAD_LENGTH) : 0
+  const padded = sign + "0".repeat(Math.max(0, width - sign.length - body.length)) + body
+
+  return useNepaliDigits ? toNepaliDigits(padded) : padded
 }
 
 /**
- * Round and format with Nepali digits
+ * Round to a fixed number of decimals and return Nepali digits, without grouping.
  *
- * @param number {string | number} - The number to round and format
- * @param decimals {number} - Precision for rounding off
+ * @param number - A number, a bigint, or a string in English, Nepali or mixed digits
+ * @param decimals - Decimal places; a value that is not an integer from 0 to 100 is read as 2
  *
- * @returns {string} - The rounded number
+ * @returns The rounded string; `""` when the input is not a number
+ *
+ * @example
+ * roundNepali(3.14159) // "३.१४"
  */
-export const roundNepali = (number: number | string, decimals: number = 2): string => {
-  const factor = Math.pow(10, decimals)
-  const rawNumber = removeFormatting(number)
-  const rounded = Math.round(rawNumber * factor) / factor
+export const roundNepali = (number: NumericInput, decimals: number = 2): string => {
+  const parsed = parseDecimal(number)
 
-  return toNepali(rounded.toFixed(decimals))
+  return parsed === null ? "" : toNepaliDigits(decimalToString(roundDecimal(parsed, readPlaces(decimals))))
 }
 
+/**
+ * Check for exactly one Nepali digit.
+ *
+ * @param char - The text to check
+ *
+ * @returns `true` only for a single character in ०–९; `false` otherwise
+ *
+ * @example
+ * isNepaliDigit("५") // true
+ */
 export const isNepaliDigit = (char: string): boolean => {
-  if (!char) {
-    return false
-  }
-
-  return NEPALI_DIGITS.includes(char)
+  return typeof char === "string" && char.length === 1 && isNepaliDigitCode(char.charCodeAt(0))
 }
 
+/**
+ * Check for exactly one English digit.
+ *
+ * @param char - The text to check
+ *
+ * @returns `true` only for a single character in 0–9; `false` otherwise
+ *
+ * @example
+ * isEnglishDigit("5") // true
+ */
 export const isEnglishDigit = (char: string): boolean => {
-  if (!char) {
+  if (typeof char !== "string" || char.length !== 1) {
     return false
   }
-  const number = parseInt(char)
 
-  return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].includes(number)
+  const code = char.charCodeAt(0)
+
+  return digitValue(code) >= 0 && !isNepaliDigitCode(code)
 }
 
-export const isMixedNumber = (input: string): boolean => {
-  const hasEnglish = /[0-9]/.test(input)
-  const hasNepali = /[०-९]/.test(input)
+/**
+ * Report which digit systems appear anywhere in the input.
+ *
+ * @param input - Any text
+ *
+ * @returns `"english"`, `"nepali"`, `"mixed"`, or `"none"` when there are no digits
+ *
+ * @example
+ * detectNumberSystem("12३४") // "mixed"
+ */
+export const detectNumberSystem = (input: string): NumberSystem => {
+  if (typeof input !== "string") {
+    return "none"
+  }
 
-  return hasEnglish && hasNepali
-}
+  let hasEnglish = false
+  let hasNepali = false
 
-export const detectNumberSystem = (input: string): NumberSystem | typeof NaN => {
-  const hasEnglish = /[0-9]/.test(input)
-  const hasNepali = /[०-९]/.test(input)
+  for (let index = 0; index < input.length; index++) {
+    const code = input.charCodeAt(index)
 
-  if (hasEnglish && hasNepali) {
-    return "mixed"
+    if (isNepaliDigitCode(code)) {
+      hasNepali = true
+    } else if (digitValue(code) >= 0) {
+      hasEnglish = true
+    }
+
+    if (hasEnglish && hasNepali) {
+      return "mixed"
+    }
   }
 
   if (hasNepali) {
     return "nepali"
   }
 
-  if (hasEnglish) {
-    return "english"
-  }
-
-  return NaN // default
+  return hasEnglish ? "english" : "none"
 }
 
+/**
+ * Check whether the input has both English and Nepali digits.
+ *
+ * @param input - Any text
+ *
+ * @returns `true` when both systems appear; `false` otherwise
+ *
+ * @example
+ * isMixedNumber("12३४") // true
+ */
+export const isMixedNumber = (input: string): boolean => detectNumberSystem(input) === "mixed"
+
+/**
+ * Check whether the whole string is a number written in Nepali digits.
+ *
+ * @param input - The text to check
+ *
+ * @returns `true` for a number in Nepali digits; `false` otherwise
+ *
+ * @example
+ * validateNepaliNumber("१२३.४५") // true
+ */
 export const validateNepaliNumber = (input: string): boolean => {
-  // Remove commas and spaces for validation
-  const cleaned = input.replace(/[,\s]/g, "")
-
-  // Check if it contains only valid characters (Nepali digits, decimal point)
-  const validPattern = /^[०-९]*\.?[०-९]*$/
-
-  if (!validPattern.test(cleaned)) {
-    return false
-  }
-
-  if (!cleaned || cleaned === ".") {
-    return false
-  }
-
-  // Check for multiple decimal points
-  const decimalCount = (cleaned.match(/\./g) || []).length
-  return decimalCount <= 1
+  return typeof input === "string" && scanDecimal(input.trim(), true) !== null
 }
 
+/**
+ * Check whether the whole string is a number, in English, Nepali or mixed digits.
+ *
+ * @param input - The text to check
+ *
+ * @returns `true` when every number-reading function would accept it; `false` otherwise
+ *
+ * @example
+ * isValidNumber("-1,234.5") // true
+ */
+export const isValidNumber = (input: string): boolean => {
+  return typeof input === "string" && scanDecimal(input.trim()) !== null
+}
+
+/**
+ * Clean up typed input: trim, remove all whitespace, collapse repeated commas and dots.
+ *
+ * @param input - Any text
+ *
+ * @returns The cleaned text; `""` for anything that is not a string
+ *
+ * @example
+ * normalize("1,,234..5") // "1,234.5"
+ */
 export const normalize = (input: string): string => {
+  if (typeof input !== "string") {
+    return ""
+  }
+
   return input
     .trim()
     .replace(/\s+/g, "")

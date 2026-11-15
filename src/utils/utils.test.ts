@@ -4,6 +4,7 @@ import {
   isEnglishDigit,
   isMixedNumber,
   isNepaliDigit,
+  isValidNumber,
   normalize,
   padZeros,
   roundNepali,
@@ -98,7 +99,8 @@ describe("Utility Functions", () => {
 
     test("handles empty and multi-character strings", () => {
       expect(isNepaliDigit("")).toBe(false)
-      expect(isNepaliDigit("१२")).toBe(true)
+      expect(isNepaliDigit("१२")).toBe(false)
+      expect(isNepaliDigit("५६")).toBe(false)
     })
 
     test("handles unicode variations", () => {
@@ -175,16 +177,16 @@ describe("Utility Functions", () => {
       expect(detectNumberSystem("Call 9७7-123")).toBe("mixed")
     })
 
-    test("defaults to NaN for non-numeric content", () => {
-      expect(detectNumberSystem("hello")).toBe(NaN)
-      expect(detectNumberSystem("")).toBe(NaN)
-      expect(detectNumberSystem("abc def")).toBe(NaN)
+    test("returns none for content without digits", () => {
+      expect(detectNumberSystem("hello")).toBe("none")
+      expect(detectNumberSystem("")).toBe("none")
+      expect(detectNumberSystem("abc def")).toBe("none")
     })
 
     test("handles edge cases", () => {
-      expect(detectNumberSystem("   ")).toBe(NaN)
-      expect(detectNumberSystem("!@#")).toBe(NaN)
-      expect(detectNumberSystem("नमस्कार")).toBe(NaN)
+      expect(detectNumberSystem("   ")).toBe("none")
+      expect(detectNumberSystem("!@#")).toBe("none")
+      expect(detectNumberSystem("नमस्कार")).toBe("none")
     })
   })
 
@@ -227,7 +229,8 @@ describe("Utility Functions", () => {
     })
 
     test("handles complex formatting", () => {
-      expect(validateNepaliNumber("१, २३४ .५६")).toBe(true)
+      expect(validateNepaliNumber("१, २३४.५६")).toBe(true)
+      expect(validateNepaliNumber("१, २३४ .५६")).toBe(false)
       expect(validateNepaliNumber("१,२,३,४")).toBe(true)
     })
   })
@@ -265,6 +268,106 @@ describe("Utility Functions", () => {
     test("preserves valid formatting", () => {
       expect(normalize("१,२३४.५६")).toBe("१,२३४.५६")
       expect(normalize("१२३")).toBe("१२३")
+    })
+  })
+  describe("ADR-0013 behaviour", () => {
+    test("padZeros keeps the sign in front and counts it", () => {
+      expect(padZeros(-5, 4)).toBe("-००५")
+      expect(padZeros(42, 5)).toBe("०००४२")
+      expect(padZeros("१२", 4)).toBe("००१२")
+      expect(padZeros(1.5, 5)).toBe("००१.५")
+      expect(padZeros(12345, 3)).toBe("१२३४५")
+      expect(padZeros(5, 0)).toBe("५")
+      expect(padZeros(5n, 3)).toBe("००५")
+      expect(padZeros(5, 3, { useNepaliDigits: false })).toBe("005")
+    })
+
+    test("padZeros never throws on a bad length and caps it at 1000", () => {
+      expect(padZeros(5, Infinity)).toBe("५")
+      expect(padZeros(5, 2.5)).toBe("५")
+      expect(padZeros(5, NaN)).toBe("५")
+      expect(padZeros(5, -3)).toBe("५")
+      expect(padZeros(5, 5000).length).toBe(1000)
+    })
+
+    test("padZeros returns an empty string for input that is not a number", () => {
+      expect(padZeros("abc", 5)).toBe("")
+      expect(padZeros("", 3)).toBe("")
+      expect(padZeros(null as unknown as string, 3)).toBe("")
+    })
+
+    test("roundNepali rounds half away from zero, exactly", () => {
+      expect(roundNepali(1.005)).toBe("१.०१")
+      expect(roundNepali(2.5, 0)).toBe("३")
+      expect(roundNepali(-2.5, 0)).toBe("-३")
+      expect(roundNepali(0.125)).toBe("०.१३")
+      expect(roundNepali(3.14159, 4)).toBe("३.१४१६")
+      expect(roundNepali("१२.३४५", 1)).toBe("१२.३")
+      expect(roundNepali("१,२३४.५६७")).toBe("१२३४.५७")
+      expect(roundNepali(0)).toBe("०.००")
+      expect(roundNepali(-0.001)).toBe("०.००")
+      expect(roundNepali(99999999999999999999n, 1)).toBe("९९९९९९९९९९९९९९९९९९९९.०")
+    })
+
+    test("roundNepali reads bad decimals as 2 and rejects non-numbers", () => {
+      expect(roundNepali(1.5, 101)).toBe("१.५०")
+      expect(roundNepali(1.5, -1)).toBe("१.५०")
+      expect(roundNepali("abc")).toBe("")
+      expect(roundNepali("")).toBe("")
+    })
+
+    test("digit checks accept exactly one character", () => {
+      expect(isEnglishDigit("5")).toBe(true)
+      expect(isEnglishDigit("56")).toBe(false)
+      expect(isEnglishDigit("5a")).toBe(false)
+      expect(isEnglishDigit(" 5")).toBe(false)
+      expect(isEnglishDigit("५")).toBe(false)
+      expect(isEnglishDigit("")).toBe(false)
+      expect(isEnglishDigit(null as unknown as string)).toBe(false)
+      expect(isNepaliDigit("5")).toBe(false)
+      expect(isNepaliDigit(null as unknown as string)).toBe(false)
+    })
+
+    test("validateNepaliNumber allows a sign and refuses English digits", () => {
+      expect(validateNepaliNumber("-१२३")).toBe(true)
+      expect(validateNepaliNumber("+१२")).toBe(true)
+      expect(validateNepaliNumber("\u2212१२")).toBe(true)
+      expect(validateNepaliNumber(" १२ ")).toBe(true)
+      expect(validateNepaliNumber(".५")).toBe(true)
+      expect(validateNepaliNumber("१२.")).toBe(true)
+      expect(validateNepaliNumber("१२.३.४")).toBe(false)
+      expect(validateNepaliNumber("123")).toBe(false)
+      expect(validateNepaliNumber("१२3")).toBe(false)
+      expect(validateNepaliNumber(".")).toBe(false)
+      expect(validateNepaliNumber(null as unknown as string)).toBe(false)
+    })
+
+    test("isValidNumber accepts either script", () => {
+      expect(isValidNumber("123")).toBe(true)
+      expect(isValidNumber("१२३")).toBe(true)
+      expect(isValidNumber("12३")).toBe(true)
+      expect(isValidNumber("-1,234.5")).toBe(true)
+      expect(isValidNumber(".५")).toBe(true)
+      expect(isValidNumber("")).toBe(false)
+      expect(isValidNumber("abc")).toBe(false)
+      expect(isValidNumber("12abc")).toBe(false)
+      expect(isValidNumber("1.2.3")).toBe(false)
+      expect(isValidNumber(null as unknown as string)).toBe(false)
+    })
+
+    test("validators handle a 100 000-character hostile string in linear time", () => {
+      const started = performance.now()
+      expect(validateNepaliNumber("९".repeat(100000) + "x")).toBe(false)
+      expect(validateNepaliNumber("९".repeat(100000))).toBe(true)
+      expect(isValidNumber("1,".repeat(50000) + "x")).toBe(false)
+      expect(isValidNumber(".".repeat(100000))).toBe(false)
+      expect(performance.now() - started).toBeLessThan(1000)
+    })
+
+    test("detection and normalize handle non-strings from JavaScript", () => {
+      expect(detectNumberSystem(null as unknown as string)).toBe("none")
+      expect(isMixedNumber(null as unknown as string)).toBe(false)
+      expect(normalize(null as unknown as string)).toBe("")
     })
   })
 })

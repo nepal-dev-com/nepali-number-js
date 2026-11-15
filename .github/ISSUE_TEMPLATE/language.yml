@@ -1,0 +1,35 @@
+name: Nepali language
+description: A Nepali word, spelling, ordinal, scale name or unit is wrong, or has a better form.
+labels: [language]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        People render and compare the strings this package returns, so a changed word is a breaking change. It starts with an ADR that the owner approves (ADR-0001), and it is asked about, never guessed (ADR-0004). This issue is where that conversation starts; please do not open a pull request with the change first.
+  - type: textarea
+    id: call
+    attributes:
+      label: The call and what it returns today
+      description: Copy the exact output.
+      placeholder: toNepaliOrdinal(6) returns "छैटौं"
+    validations:
+      required: true
+  - type: textarea
+    id: proposed
+    attributes:
+      label: What it should return
+      description: The exact string you propose.
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Source
+      description: A dictionary, a grammar, a style guide, a government or bank document, or where the form is used.
+    validations:
+      required: true
+  - type: textarea
+    id: forms
+    attributes:
+      label: Is more than one form in use?
+      description: Say where each is used, if you know. Both may need to be supported.
