@@ -19,7 +19,8 @@ the rest of that section.
 read from its path in §11.
 
 > **Status.** The working agreement is set out in ADR-0001 to ADR-0011, all **Approved** by the
-> owner on 2026-11-14. Where two of them disagree, the newer one holds.
+> owner on 2026-11-14, and ADR-0019, approved on 2026-11-15. Where two of them disagree, the
+> newer one holds.
 
 ## 1. What this project is
 
@@ -176,6 +177,7 @@ depend on the answer, then ask.
 | Clean `dist/` and `coverage/` | `bun run clean` |
 | Clean reinstall | `bun run clean:fresh` |
 | Add a dependency | `bun add -d <pkg>` — **requires an approved ADR first**; runtime deps are not allowed (§6) |
+| Upgrade a dependency or an action | Dependabot proposes it weekly. Minor and patch need no ADR; a major version, and any `tsdown` 0.x minor, does (ADR-0019) |
 
 Run `bun run type-check`, `bun run test` and `bun run build` before declaring work complete.
 
@@ -311,13 +313,16 @@ full audit that runs before each release. Read it before a change touches any of
 .
 ├── AGENTS.md, CLAUDE.md   # this working agreement; CLAUDE.md imports it
 ├── README.md, LICENSE     # consumer-facing overview (npm shows it); MIT
+├── CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, SUPPORT.md, CITATION.cff
+│                          # for people on GitHub; they add no rule (ADR-0019)
 ├── docs/
 │   ├── agent-skills/      # this repository's own skills, nepali-number-* (ADR-0011)
 │   ├── _templates/        # a starting point for each document type
 │   └── docs.nepal-dev.com/  # git submodule: the documentation site (§8)
 ├── .claude/skills/, .agents/skills/   # links into docs/agent-skills/
 ├── src/                   # nepali-number.ts (the only build entry), constants.ts, one folder per domain
-├── .github/workflows/     # ci.yml, release.yml
+├── .github/               # issue forms, PR template, CODEOWNERS, FUNDING.yml, dependabot.yml;
+│                          # workflows/: ci.yml, release.yml, codeql.yml (ADR-0019)
 ├── package.json, tsconfig.json, tsdown.config.ts, bunfig.toml
 ├── dist/, coverage/       # generated, git-ignored, never edited
 └── sample/                # reference material from another project — not part of the package

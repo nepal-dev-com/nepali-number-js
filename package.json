@@ -4,7 +4,7 @@
   "description": "Convert, transliterate, and format numbers between English and Nepali (Devanagari) with full Unicode support. Includes translation utilities for working with localized number systems.",
   "keywords": ["nepali", "devanagari", "hindi", "numbers", "digits", "conversion", "transliteration", "translation", "formatting", "unicode", "localization", "i18n", "l10n", "bilingual", "english-numbers", "nepali-numbers", "hindi-numbers"],
   "license": "MIT",
-  "homepage": "https://github.com/puncoz-official/nepali-number-js",
+  "homepage": "https://github.com/nepal-dev-com/nepali-number-js",
   "author": {
     "name": "Puncoz Nepal",
     "email": "info@puncoz.com",
@@ -12,10 +12,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/puncoz-official/nepali-number-js.git"
+    "url": "git+https://github.com/nepal-dev-com/nepali-number-js.git"
   },
   "bugs": {
-    "url": "https://github.com/puncoz-official/nepali-number-js/issues"
+    "url": "https://github.com/nepal-dev-com/nepali-number-js/issues"
   },
   "scripts": {
     "build": "tsdown --clean --dts",

@@ -4,7 +4,7 @@
 [![npm download (18m)](https://img.shields.io/npm/d18m/nepali-number)](https://www.npmjs.com/package/nepali-number)
 [![npm bundle size](https://img.shields.io/bundlephobia/min/nepali-number)](https://bundlephobia.com/result?p=nepali-number)
 [![npm bundle size](https://img.shields.io/bundlephobia/minzip/nepali-number)](https://bundlephobia.com/result?p=nepali-number)
-[![codecov](https://codecov.io/gh/puncoz-official/nepali-number-js/graph/badge.svg)](https://codecov.io/gh/puncoz-official/nepali-number-js)
+[![codecov](https://codecov.io/gh/nepal-dev-com/nepali-number-js/graph/badge.svg)](https://codecov.io/gh/nepal-dev-com/nepali-number-js)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/puncoz)](https://x.com/puncoz)
 
@@ -255,45 +255,21 @@ The full list, with a workaround for each, is in
 
 ## Contributing
 
-Issues and pull requests are welcome. Read [**`AGENTS.md`**](AGENTS.md) first — it is the
-working agreement for everyone, human or AI.
+Issues and pull requests are welcome. Start with [**`CONTRIBUTING.md`**](CONTRIBUTING.md): how to
+report a bug or a wrong Nepali word, how to set up, and what a pull request needs.
 
 In short: **every feature and functional change starts with an ADR** in
 [decision records](https://docs.nepal-dev.com/nepali-number/maintainer-guide/adr) that the owner approves before code is written. Any change a
 consumer can observe — including a changed word or spelling — ships its
 [API reference](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api) update and a semver decision with it. Tests are part of
-every change. Unclear Nepali-language or rounding questions are asked, not guessed.
+every change. Unclear Nepali-language or rounding questions are asked, not guessed. The working
+agreement itself, for people and AI agents alike, is [`AGENTS.md`](AGENTS.md).
 
-```bash
-git clone https://github.com/puncoz-official/nepali-number-js.git
-cd nepali-number-js
-bun install
-
-bun run type-check   # tsc --noEmit, strict
-bun run test         # bun test, with coverage
-bun run build        # tsdown → dist/ (ESM, CJS, UMD, IIFE, .d.ts)
-bun run dev          # rebuild on change
-```
-
-Requires [Bun](https://bun.sh). CI runs the same three checks on Node.js 20, 22 and 24, then
-packs and installs the tarball as a smoke test.
-
-```
-src/
-├── nepali-number.ts   # public entry — re-exports every domain
-├── constants.ts       # digits, words, ordinals, scales
-├── conversion/        # toNepali, toEnglish, parseNepaliNumber, convert; the exact number reader
-├── formatting/        # formatNepaliNumber, addNepaliCommas, formatPercent, removeFormatting
-├── utils/             # normalize, detection, validation, padZeros, roundNepali
-├── words/             # cardinals, ordinals, short forms, words to numbers
-├── currency/          # toNepaliCurrency, currency words, parseNepaliCurrency
-├── fractions/         # toNepaliFraction, toNepaliFractionWords, toNepaliMultiplier
-├── units/             # land area and weight in traditional units
-└── text/              # numbers inside prose, comparing and sorting
-```
-
-**Security issues:** please report privately to <info@puncoz.com> rather than in a public
-issue ([security](https://docs.nepal-dev.com/nepali-number/maintainer-guide/security)).
+| | |
+|---|---|
+| [Code of conduct](CODE_OF_CONDUCT.md) | How we treat each other here |
+| [Getting help](SUPPORT.md) | Where a question, a bug or an idea goes |
+| [Security policy](SECURITY.md) | **Report a vulnerability privately**, never in a public issue |
 
 ## License
 

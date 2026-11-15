@@ -1,0 +1,43 @@
+name: Bug
+description: A function returns something other than what the documentation says.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For a security problem, use the security policy instead. For a Nepali word or spelling you believe is wrong, use the Nepali language form.
+  - type: textarea
+    id: call
+    attributes:
+      label: The call
+      description: The smallest code that shows it.
+      render: ts
+      placeholder: toNepaliWords(1234567)
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What it returned
+      description: Copy the exact output, Devanagari included.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+      description: Link the documentation page that says so, if there is one.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: nepali-number version
+      placeholder: 2.0.0
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Runtime and how the package is loaded
+      placeholder: Node 22, ESM import
