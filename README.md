@@ -85,6 +85,24 @@ In the browser without a build step, the IIFE build exposes a global **`nepaliNu
 TypeScript declarations are included — no `@types` package needed. Details for every
 environment: [**Getting started**](https://docs.nepal-dev.com/nepali-number/user-guide/latest/getting-started).
 
+## Using an AI coding agent
+
+Paste this into Claude Code, Cursor, Copilot or another coding agent, and change the last line
+to your task:
+
+```text
+Add the npm package "nepali-number" (version 2) to this project with the package manager the
+project already uses. Before writing code, read
+https://docs.nepal-dev.com/nepali-number/user-guide/latest/api.md and use only the functions it
+lists, imported by name from "nepali-number". If the installed version is 1.x, stop and tell me.
+Invalid input returns NaN or "" and never throws: handle it, and do not assume zero.
+
+My task: show prices in Nepali digits with the rupee symbol on the cart page.
+```
+
+More prompts, and rules to keep in your project's `AGENTS.md`:
+[**Using an AI coding agent**](https://docs.nepal-dev.com/nepali-number/user-guide/latest/guides/ai-agents).
+
 ## API at a glance
 
 45 named, pure functions in eight domains. Full reference with options, defaults and edge cases:
@@ -228,6 +246,7 @@ The full list, with a workaround for each, is in
 |---|---|
 | [Getting started](https://docs.nepal-dev.com/nepali-number/user-guide/latest/getting-started) | Install and import in Node, Bun, Deno, bundlers, TypeScript, the browser |
 | [Recipes](https://docs.nepal-dev.com/nepali-number/user-guide/latest/guides/recipes) | Reading typed input, displaying amounts, cheques in words, sorting, land area, React and Vue helpers |
+| [Using an AI coding agent](https://docs.nepal-dev.com/nepali-number/user-guide/latest/guides/ai-agents) | Prompts to paste, rules for your `AGENTS.md`, docs as Markdown |
 | [API reference](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api) | Every export: signature, options, defaults, outputs |
 | [Limitations](https://docs.nepal-dev.com/nepali-number/user-guide/latest/api/limitations) | Edge cases and workarounds |
 | [Migrating from v1](https://docs.nepal-dev.com/nepali-number/user-guide/latest/guides/migration-v1-to-v2) | v1 function → v2 function |
